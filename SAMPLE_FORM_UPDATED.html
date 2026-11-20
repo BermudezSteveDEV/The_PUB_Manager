@@ -1,0 +1,269 @@
+<!-- Sample Defect Form - Updated for Firestore REST API -->
+<!-- This is an example of how to convert your forms to use the new API -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Defect - PUB Manager</title>
+  <script src="api-service.js"></script>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Add New Defect</h2>
+    
+    <form id="defectForm" onsubmit="submitDefect(event)">
+      <div class="form-group">
+        <label for="jiraId">JIRA ID *</label>
+        <input type="text" id="jiraId" required placeholder="e.g., BUG-123">
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea id="description" required placeholder="Describe the defect"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="priority">Priority *</label>
+        <select id="priority" required>
+          <option value="">Select Priority</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="component">Component</label>
+        <input type="text" id="component" placeholder="e.g., Backend, Frontend">
+      </div>
+
+      <div class="form-group">
+        <label for="assignee">Assignee</label>
+        <input type="text" id="assignee" placeholder="Person name">
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Add Defect</button>
+        <button type="reset" class="btn-secondary">Clear</button>
+      </div>
+
+      <!-- Loading and Error Messages -->
+      <div id="formMessage" class="message"></div>
+    </form>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    function checkAuth() {
+      const user = sessionStorage.getItem('loggedInUser');
+      if (!user) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Submit defect form - NEW ASYNC VERSION
+    async function submitDefect(event) {
+      event.preventDefault();
+      const messageEl = document.getElementById('formMessage');
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+      
+      try {
+        // Show loading state
+        messageEl.innerHTML = '⏳ Adding defect...';
+        messageEl.className = 'message loading';
+        submitBtn.disabled = true;
+
+        // Collect form data
+        const defect = {
+          jiraId: document.getElementById('jiraId').value,
+          description: document.getElementById('description').value,
+          priority: document.getElementById('priority').value,
+          component: document.getElementById('component').value || 'Unspecified',
+          assignee: document.getElementById('assignee').value || null
+        };
+
+        // Call API to add defect
+        const response = await api.addDefect(defect);
+
+        // Show success message
+        messageEl.innerHTML = '✅ Defect added successfully!';
+        messageEl.className = 'message success';
+
+        // Reset form
+        document.getElementById('defectForm').reset();
+
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          window.location.href = 'view.html';
+        }, 2000);
+
+      } catch (error) {
+        // Show error message
+        console.error('Error adding defect:', error);
+        messageEl.innerHTML = `❌ Error: ${error.message}`;
+        messageEl.className = 'message error';
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+    });
+  </script>
+
+  <style>
+    .form-container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #45a049;
+    }
+
+    .btn-primary:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .message.loading {
+      background: #e2e3e5;
+      color: #383d41;
+      border: 1px solid #d6d8db;
+    }
+  </style>
+</body>
+</html>
+
+<!-- 
+CONVERSION GUIDE - OLD TO NEW
+
+OLD CODE (using localStorage):
+=================================
+function addDefect() {
+  const defect = {
+    jiraId: document.getElementById('jiraId').value,
+    description: document.getElementById('description').value,
+    priority: document.getElementById('priority').value
+  };
+  AppState.addDefect(defect);
+  AppState.saveData();  // Manual save
+  window.location.href = 'view.html';
+}
+
+
+NEW CODE (using Firestore API):
+================================
+async function submitDefect(event) {
+  event.preventDefault();
+  try {
+    const defect = {
+      jiraId: document.getElementById('jiraId').value,
+      description: document.getElementById('description').value,
+      priority: document.getElementById('priority').value
+    };
+    await api.addDefect(defect);  // Automatic save to Firestore
+    window.location.href = 'view.html';
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+}
+
+KEY DIFFERENCES:
+1. Use 'async/await' instead of synchronous code
+2. Use 'api.' instead of 'AppState.'
+3. No need to call saveData() - happens automatically
+4. Error handling with try/catch
+5. Can show loading states while waiting for API
+
+PATTERN FOR ALL OPERATIONS:
+Try {
+  1. Show loading message
+  2. Collect form data
+  3. Call API method: await api.addDefect(data)
+  4. Show success message
+  5. Redirect or reset form
+} Catch (error) {
+  Show error message
+}
+-->

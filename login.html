@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUB Manager - Login</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="apple-mobile-web-app-title" content="PUB Manager" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #0066ff;
+      --primary-light: #e6f0ff;
+      --secondary: #6b21a8;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 12px 24px rgba(15, 23, 42, 0.12);
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 900px;
+      background: var(--bg-primary);
+      border-radius: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 600px;
+    }
+
+    .auth-left {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .auth-logo {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .auth-left h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+    }
+
+    .auth-left p {
+      font-size: 1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .auth-right {
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-container {
+      display: none;
+    }
+
+    .form-container.active {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .form-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    .form-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-input:disabled {
+      background: var(--bg-secondary);
+      cursor: not-allowed;
+    }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .role-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+
+    .role-checkbox input {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+    }
+
+    .role-checkbox label {
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .form-button {
+      width: 100%;
+      padding: 0.875rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 0.5rem;
+    }
+
+    .form-button:hover {
+      background: #0052cc;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+    }
+
+    .form-button:active {
+      transform: translateY(0);
+    }
+
+    .form-toggle {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .form-toggle button {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .form-toggle button:hover {
+      color: var(--secondary);
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .success-message {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      display: none;
+      font-size: 0.9rem;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .auth-container {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-left {
+        display: none;
+      }
+
+      .auth-right {
+        padding: 2rem 1.5rem;
+      }
+
+      .roles-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .required-field::after {
+      content: ' *';
+      color: var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <!-- Left Panel -->
+    <div class="auth-left">
+      <div class="auth-logo">📊</div>
+      <h1>PUB Manager</h1>
+      <p>Manage defects and change requests with ease. Track, resolve, and organize all your work in one place.</p>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="auth-right">
+      <!-- Login Form -->
+      <form id="loginForm" class="form-container active">
+        <h2 class="form-title">Welcome Back</h2>
+        <p class="form-subtitle">Sign in to your account</p>
+
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" class="form-input" placeholder="your@email.com" required>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+          <div class="error-message"></div>
+        </div>
+
+        <button type="submit" class="form-button">Sign In</button>
+
+        <div class="form-toggle">
+          Don't have an account? <button type="button" onclick="toggleForm()">Create one</button>
+        </div>
+      </form>
+
+      <!-- Registration Form -->
+      <form id="registerForm" class="form-container">
+        <h2 class="form-title">Create Account</h2>
+        <p class="form-subtitle">Join us today</p>
+
+        <div class="success-message" id="successMessage">
+          Account created successfully! Please log in.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required-field" for="regFullName">Full Name</label>
+          <input type="text" id="regFullName" class="form-input" placeholder="John Doe" required>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required-field" for="regEmail">Email Address</label>
+          <input type="email" id="regEmail" class="form-input" placeholder="your@email.com" required>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required-field" for="regPassword">Password</label>
+          <input type="password" id="regPassword" class="form-input" placeholder="••••••••" required>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required-field" for="regConfirmPassword">Confirm Password</label>
+          <input type="password" id="regConfirmPassword" class="form-input" placeholder="••••••••" required>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regManager">Manager (Optional)</label>
+          <input type="text" id="regManager" class="form-input" placeholder="Your manager's name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required-field">PUB Roles</label>
+          <div class="roles-grid" id="rolesGrid">
+            <!-- Roles will be populated by JavaScript -->
+          </div>
+          <div class="error-message" id="rolesError"></div>
+        </div>
+
+        <button type="submit" class="form-button">Create Account</button>
+
+        <div class="form-toggle">
+          Already have an account? <button type="button" onclick="toggleForm()">Sign in</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // PUB Roles List
+    const PUB_ROLES = [
+      'CC_PJF_PROJECT_INTEGRATION_SPECIALIST_JOBCOMCAST_CUSTOM',
+      'CMST_PRJ_REPORTING_CORP_JOB',
+      'CMST_PRJ_PROJECT_BUSINESS_SETUP_JOB',
+      'CMST_IT_APPLICATION_ADMINISTRATOR_JOB',
+      'CMST_IT_SECURITY_MANAGER_JOB',
+      'CMST_PRJ_ADMINISTRATOR_JOB',
+      'CMST_PUB_PROJECT_MANAGER_JOB',
+      'CMST_IT_LOAD_INTERFACE_FILE_FOR_IMPORT_JOB',
+      'CMST_IT_FINANCIAL_APPLICATION_ADMINISTRATOR_JOB',
+      'CMST_HUB2U_TECH_USER_JOB',
+      'CMST_ESS_EMPLOYEE_ABSTRACT',
+      'CMST_PRJ_PROJECT_RESOURCE_JOB',
+      'CMST_GM_GRANTS_MANAGER_JOB',
+      'CMST_PRJ_PROJECT_BILLING_SPECIALIST_JOB',
+      'CMST_PUB_PROJECT_PARTICIPANT_JOB',
+      'CMST_GM_REPORTING_JOB',
+      'CMST_ABILITY_EXT_BILLING_CUSTOM_OBJECT_JOB',
+      'CMST_PRJ_PROGRAM_MANAGER_JOB',
+      'CMST_CAPEX_INCORTA_REPORTING_JOB'
+    ];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      populateRoles();
+      setupEventListeners();
+    });
+
+    // Populate roles checkboxes
+    function populateRoles() {
+      const rolesGrid = document.getElementById('rolesGrid');
+      rolesGrid.innerHTML = PUB_ROLES.map((role, index) => {
+        const shortRole = role.split('_').slice(-3).join('_');
+        return `
+          <div class="role-checkbox">
+            <input type="checkbox" id="role_${index}" name="roles" value="${role}">
+            <label for="role_${index}" title="${role}">${shortRole}</label>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Toggle between login and registration
+    function toggleForm() {
+      document.getElementById('loginForm').classList.toggle('active');
+      document.getElementById('registerForm').classList.toggle('active');
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+      document.getElementById('registerForm').addEventListener('submit', handleRegister);
+    }
+
+    // Handle Login
+    async function handleLogin(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const submitBtn = e.target.querySelector('.form-button');
+        submitBtn.disabled = true;
+
+        // Call Firestore API
+        const response = await api.login(email, password);
+
+        // Success - store session with user ID and roles
+        sessionStorage.setItem('loggedInUser', JSON.stringify({
+          id: response.user.id,
+          name: response.user.name,
+          email: response.user.email,
+          roles: response.user.roles || [],
+          manager: response.user.manager
+        }));
+
+        window.location.href = 'index.html';
+      } catch (error) {
+        showError('loginEmail', error.message);
+        e.target.querySelector('.form-button').disabled = false;
+      }
+    }
+
+    // Handle Registration
+    async function handleRegister(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('regFullName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regConfirmPassword').value;
+      const manager = document.getElementById('regManager').value.trim();
+      const selectedRoles = Array.from(document.querySelectorAll('input[name="roles"]:checked')).map(cb => cb.value);
+
+      // Validation
+      clearErrors();
+
+      if (!name) {
+        showError('regFullName', 'Full name is required');
+        return;
+      }
+
+      if (!email) {
+        showError('regEmail', 'Email is required');
+        return;
+      }
+
+      if (!password || password.length < 6) {
+        showError('regPassword', 'Password must be at least 6 characters');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showError('regConfirmPassword', 'Passwords do not match');
+        return;
+      }
+
+      if (selectedRoles.length === 0) {
+        document.getElementById('rolesError').textContent = 'Please select at least one role';
+        document.getElementById('rolesError').style.display = 'block';
+        return;
+      }
+
+      try {
+        const submitBtn = e.target.querySelector('.form-button');
+        submitBtn.disabled = true;
+
+        // Call Firestore API
+        await api.register(name, email, password, manager || null, selectedRoles);
+
+        // Show success message
+        document.getElementById('successMessage').classList.add('show');
+        
+        // Reset form
+        document.getElementById('registerForm').reset();
+
+        // Switch to login after 2 seconds
+        setTimeout(() => {
+          toggleForm();
+          document.getElementById('successMessage').classList.remove('show');
+          submitBtn.disabled = false;
+        }, 2000);
+      } catch (error) {
+        showError('regEmail', error.message);
+        e.target.querySelector('.form-button').disabled = false;
+      }
+    }
+
+    // Utility Functions
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorDiv = field.parentElement.querySelector('.error-message');
+      errorDiv.textContent = message;
+      errorDiv.classList.add('show');
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.error-message').forEach(el => {
+        el.classList.remove('show');
+        el.textContent = '';
+      });
+      document.getElementById('rolesError').style.display = 'none';
+    }
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
+  <script src="api-service.js"></script>
+</body>
+</html>

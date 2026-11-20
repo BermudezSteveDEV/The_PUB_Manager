@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Task - PUB Manager</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="apple-mobile-web-app-title" content="PUB Manager" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261119-description-links" />
+  <style>
+    .form-page-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-section {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .form-section-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-lg);
+      color: var(--text-primary);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 2px solid var(--secondary);
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Header -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-section">
+          <img src="pub-manager-logo.png" alt="PUB Manager" class="header-logo-image">
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <div class="form-page-container">
+      <div class="section-header">
+        <h1>Add New Task</h1>
+        <p class="section-subtitle">Create and track a new task in the system</p>
+      </div>
+
+      <form id="taskForm">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h2 class="form-section-title">Basic Information</h2>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label required-field">JIRA ID</label>
+              <input type="text" id="jiraId" class="form-input" placeholder="e.g., TASK-1234" required>
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required-field">Priority</label>
+              <select id="priority" class="form-input" required>
+                <option value="">Select Priority</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <div class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">JIRA Link</label>
+            <input type="url" id="jiraLink" class="form-input" placeholder="https://jira.example.com/browse/TASK-1234">
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required-field">Task Title</label>
+            <input type="text" id="title" class="form-input" placeholder="Brief description of the task" required>
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="description" class="form-input" placeholder="Detailed description of the task..." style="resize: vertical; min-height: 120px;"></textarea>
+            <div class="error-message"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Application</label>
+            <select id="application" class="form-input">
+              <option value="">-- Not Specified (PUB) --</option>
+              <option value="PUB">PUB</option>
+              <option value="EDCA">EDCA</option>
+            </select>
+            <div class="error-message"></div>
+          </div>
+        </div>
+
+        <!-- Task Details -->
+        <div class="form-section">
+          <h2 class="form-section-title">Task Details</h2>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="status" class="form-input">
+                <option value="">Select Status</option>
+                <option value="To Do">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="In Review">In Review</option>
+                <option value="Done">Done</option>
+                <option value="Blocked">Blocked</option>
+              </select>
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Task Type</label>
+              <select id="taskType" class="form-input">
+                <option value="">Select Type</option>
+                <option value="Development">Development</option>
+                <option value="Testing">Testing</option>
+                <option value="Documentation">Documentation</option>
+                <option value="Bug Fix">Bug Fix</option>
+                <option value="Review">Review</option>
+              </select>
+              <div class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Effort Estimate (hours)</label>
+            <input type="number" id="effortEstimate" class="form-input" placeholder="e.g., 8" min="0.5" step="0.5">
+            <div class="error-message"></div>
+          </div>
+        </div>
+
+        <!-- Assignment & Timeline -->
+        <div class="form-section">
+          <h2 class="form-section-title">Assignment & Timeline</h2>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label required-field">Assigned To</label>
+              <input type="text" id="assignee" class="form-input" placeholder="Team member name" required>
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Related Story/Epic</label>
+              <input type="text" id="relatedItem" class="form-input" placeholder="Story or Epic ID">
+              <div class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label">Start Date</label>
+              <input type="date" id="startDate" class="form-input">
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Due Date</label>
+              <input type="date" id="dueDate" class="form-input">
+              <div class="error-message"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="form-section">
+          <h2 class="form-section-title">Additional Information</h2>
+
+          <div class="form-group">
+            <label class="form-label">Acceptance Criteria</label>
+            <textarea id="acceptanceCriteria" class="form-input" placeholder="List task completion criteria..." style="resize: vertical; min-height: 80px;"></textarea>
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dependencies & Blockers</label>
+            <textarea id="dependencies" class="form-input" placeholder="List any task dependencies or blockers..." style="resize: vertical; min-height: 80px;"></textarea>
+            <div class="error-message"></div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-section" style="border: none; box-shadow: none; padding: 0;">
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="goBack()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Task</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Check authentication
+    if (!sessionStorage.getItem('loggedInUser')) {
+      window.location.href = 'login.html';
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+
+    function validateForm() {
+      const jiraId = document.getElementById('jiraId').value.trim();
+      const priority = document.getElementById('priority').value;
+      const title = document.getElementById('title').value.trim();
+      const assignee = document.getElementById('assignee').value.trim();
+
+      if (!jiraId || !priority || !title || !assignee) {
+        alert('Please fill in all required fields');
+        return false;
+      }
+
+      return true;
+    }
+
+    // Form submission
+    document.getElementById('taskForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      if (!validateForm()) {
+        return;
+      }
+
+      try {
+        const submitBtn = e.target.querySelector('[type="submit"]');
+        submitBtn.disabled = true;
+
+        const task = {
+          jiraId: document.getElementById('jiraId').value.trim(),
+          jiraLink: document.getElementById('jiraLink').value.trim(),
+          priority: document.getElementById('priority').value,
+          title: document.getElementById('title').value.trim(),
+          description: document.getElementById('description').value.trim(),
+          application: document.getElementById('application').value || 'PUB',
+          status: document.getElementById('status').value || 'To Do',
+          taskType: document.getElementById('taskType').value,
+          effortEstimate: document.getElementById('effortEstimate').value,
+          assignee: document.getElementById('assignee').value.trim(),
+          relatedItem: document.getElementById('relatedItem').value.trim(),
+          startDate: document.getElementById('startDate').value,
+          dueDate: document.getElementById('dueDate').value,
+          acceptanceCriteria: document.getElementById('acceptanceCriteria').value.trim(),
+          dependencies: document.getElementById('dependencies').value.trim()
+        };
+
+        // Call Firestore API
+        await api.addTask(task);
+
+        alert('Task created successfully!');
+        window.location.href = 'index.html';
+      } catch (error) {
+        alert('Error: ' + error.message);
+        e.target.querySelector('[type="submit"]').disabled = false;
+      }
+    });
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
+  <script src="api-service.js"></script>
+  <script src="app-firestore.js?v=20261119-description-links"></script>
+</body>
+</html>

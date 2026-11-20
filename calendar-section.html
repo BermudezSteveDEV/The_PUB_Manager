@@ -1,0 +1,119 @@
+<!-- Calendar Section -->
+<section id="calendar-section" class="section">
+  <div class="section-header">
+    <h1>📅 Calendar</h1>
+    <p class="section-subtitle">View Jira due dates, holidays, and manage events</p>
+  </div>
+
+  <div class="calendar-container">
+    <!-- Calendar Header with Controls -->
+    <div class="calendar-header" id="calendarHeader">
+      <!-- Will be populated by JavaScript -->
+    </div>
+
+    <!-- Calendar View -->
+    <div class="calendar-grid-wrapper">
+      <!-- Days of week header -->
+      <div class="calendar-days-header" id="calendarDaysHeader">
+        <!-- Will be populated by JavaScript -->
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="calendar-grid" id="calendarGrid">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="calendar-legend">
+      <h3>Legend</h3>
+      <div class="legend-items">
+        <div class="legend-item">
+          <span class="calendar-ticket-badge ticket-defect">ID</span>
+          <span>Jira Ticket (Due Date)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-holiday">🎉</span>
+          <span>Holiday</span>
+        </div>
+        <div class="legend-item">
+          <span class="calendar-event-badge event-default">Evt</span>
+          <span>User Event</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day Details Modal -->
+  <div class="calendar-modal" id="calendarDayModal">
+    <div class="calendar-modal-content" id="calendarDayModalContent">
+      <!-- Will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <!-- Event Modal -->
+  <div class="calendar-modal" id="calendarEventModal">
+    <div class="calendar-modal-content">
+      <div class="calendar-modal-header">
+        <h2 id="calendarEventModalTitle">Add Event</h2>
+        <button class="calendar-modal-close" onclick="CalendarManager.closeEventModal()">×</button>
+      </div>
+
+      <form id="calendarEventForm" class="event-form">
+        <input type="hidden" id="eventId">
+
+        <div class="form-group">
+          <label class="form-label required-field">Event Title</label>
+          <input type="text" id="eventTitle" class="form-input" placeholder="Enter event title" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label required-field">Date</label>
+          <input type="date" id="eventDate" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Time</label>
+          <input type="time" id="eventTime" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Event Type</label>
+          <select id="eventType" class="form-input">
+            <option value="meeting">Meeting</option>
+            <option value="deadline">Deadline</option>
+            <option value="reminder">Reminder</option>
+            <option value="milestone">Milestone</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="eventDescription" class="form-input" placeholder="Enter event description" rows="3"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="CalendarManager.closeEventModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="CalendarManager.saveEvent()">Save Event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Overlay -->
+<script>
+  // Close modal when clicking outside
+  window.addEventListener('click', (event) => {
+    const dayModal = document.getElementById('calendarDayModal');
+    const eventModal = document.getElementById('calendarEventModal');
+
+    if (event.target === dayModal) {
+      dayModal.style.display = 'none';
+    }
+    if (event.target === eventModal) {
+      eventModal.style.display = 'none';
+    }
+  });
+</script>

@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Ticket - PUB Manager</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="apple-mobile-web-app-title" content="PUB Manager" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261119-description-links" />
+  <style>
+    .view-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: var(--spacing-xl);
+    }
+
+    .view-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-xl);
+      flex-wrap: wrap;
+      gap: var(--spacing-lg);
+    }
+
+    .view-title {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .view-title h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    .view-title .ticket-id {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .view-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+    }
+
+    .view-content {
+      background: var(--bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .view-section {
+      padding: var(--spacing-xl);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .view-section:last-child {
+      border-bottom: none;
+    }
+
+    .view-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: var(--spacing-lg);
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .view-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--spacing-lg);
+    }
+
+    .view-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .view-field-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-sm);
+      letter-spacing: 0.5px;
+    }
+
+    .view-field-value {
+      font-size: 14px;
+      color: var(--tex t-primary);
+      word-break: break-word;
+      line-height: 1.6;
+    }
+
+    .view-field-value.empty {
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .view-link {
+      color: var(--primary);
+      text-decoration: none;
+      border-bottom: 1px solid var(--primary);
+    }
+
+    .view-link:hover {
+      color: var(--primary-hover);
+      border-bottom-color: var(--primary-hover);
+    }
+
+    .status-badge-view {
+      display: inline-block;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .priority-badge-view {
+      display: inline-block;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-sm) var(--spacing-md);
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s ease;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .back-button:hover {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .view-description {
+      white-space: pre-wrap;
+      background: var(--bg-hover);
+      padding: var(--spacing-lg);
+      border-radius: 4px;
+      border-left: 3px solid var(--primary);
+    }
+
+    @media (max-width: 768px) {
+      .view-container {
+        padding: var(--spacing-lg);
+      }
+
+      .view-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .view-actions {
+        width: 100%;
+      }
+
+      .view-actions button {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .view-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stock-ticker" id="stockTicker" aria-label="Stock ticker" hidden></div>
+  <div class="weather-ticker" id="weatherTicker" aria-label="Current weather ticker"></div>
+  <div class="tech-news-ticker" id="techNewsTicker" role="region" aria-label="Technology news from TLDR">
+    <a class="tech-news-label" href="https://tldr.tech/" target="_blank" rel="noopener noreferrer">TECH NEWS · TLDR</a>
+    <div class="tech-news-viewport"></div>
+    <button class="tech-news-pause" type="button" aria-label="Pause tech news scrolling" aria-pressed="false" hidden>Pause</button>
+  </div>
+
+  <!-- Navigation Header -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-section">
+          <img src="pub-manager-logo.png" alt="PUB Manager" class="header-logo-image">
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="user-profile-wrapper">
+          <button class="user-profile-btn" onclick="toggleUserMenu()" title="User Profile">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span class="user-name" id="userName">User</span>
+            <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          
+          <!-- User Dropdown Menu -->
+          <div class="user-menu" id="userMenu" onclick="event.stopPropagation()">
+            <div class="user-menu-header">
+              <div class="user-avatar" id="userMenuAvatar">U</div>
+              <div>
+                <p id="userMenuName" style="font-weight: 600; margin: 0;">User Name</p>
+                <p id="userMenuEmail" style="font-size: 12px; color: var(--text-secondary); margin: 0;">user@example.com</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="app-wrapper">
+    <!-- Main Content -->
+    <main class="main-content" style="flex: 1;">
+      <div class="view-container">
+        <a href="index.html" class="back-button">← Back to Dashboard</a>
+
+        <div class="view-header">
+          <div class="view-title">
+            <h1 id="ticketTitle">Ticket Details</h1>
+            <span class="ticket-id" id="ticketId"></span>
+          </div>
+          <div class="view-actions">
+            <div id="actionButtons" class="view-action-buttons"></div>
+            <button class="btn btn-primary" onclick="goBack()">← Back</button>
+            <button class="btn btn-secondary" onclick="exportSingleTicket()">📥 Export as CSV</button>
+          </div>
+        </div>
+
+        <div class="view-content" id="ticketContent">
+          <p style="padding: var(--spacing-xl); text-align: center; color: var(--text-secondary);">Loading ticket details...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- User Menu Overlay -->
+  <div id="userMenuOverlay" class="menu-overlay" onclick="closeUserMenu()"></div>
+
+  <script>
+    // Initialize from sessionStorage
+    function initializeView() {
+      const viewData = JSON.parse(sessionStorage.getItem('viewTicket'));
+      
+      if (!viewData || !viewData.item) {
+        document.getElementById('ticketContent').innerHTML = '<p style="padding: var(--spacing-xl); text-align: center; color: var(--text-secondary);">No ticket data found. <a href="index.html">Go back to dashboard</a></p>';
+        return;
+      }
+
+      const { item, type } = viewData;
+      renderTicketDetails(item, type);
+      renderActionButtons(type);
+
+      // Store current ticket for export
+      window.currentTicket = { item, type };
+    }
+
+    function renderTicketDetails(item, type) {
+      document.getElementById('ticketTitle').textContent = item.title || 'Ticket Details';
+      document.getElementById('ticketId').textContent = item.jiraId || item.id;
+
+      let html = '';
+
+      // Basic Information Section
+      html += `
+        <div class="view-section">
+          <div class="view-section-title">Basic Information</div>
+          <div class="view-grid">
+            <div class="view-field">
+              <div class="view-field-label">${getIdLabel(type)}</div>
+              <div class="view-field-value">${item.id || 'N/A'}</div>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">JIRA ID</div>
+              <div class="view-field-value">${item.jiraId || 'N/A'}</div>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Title</div>
+              <div class="view-field-value">${item.title || 'N/A'}</div>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Status</div>
+              <div class="view-field-value">
+                <span class="status-badge-view ${(item.status || '').toLowerCase().replace(/[\s\/]/g, '-')}">${item.status || 'N/A'}</span>
+              </div>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Assignee</div>
+              <div class="view-field-value">${item.assignee || 'Unassigned'}</div>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Due Date</div>
+              <div class="view-field-value">${item.dueDate || 'N/A'}</div>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Type</div>
+              <div class="view-field-value">${getTypeLabel(type)}</div>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Priority</div>
+              <div class="view-field-value">
+                <span class="priority-badge-view ${(item.priority || 'medium').toLowerCase()}">${item.priority || 'N/A'}</span>
+              </div>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Application</div>
+              <div class="view-field-value">
+                <span class="application-badge ${(item.application || 'PUB') === 'EDCA' ? 'edca' : 'pub'}">${item.application || 'PUB'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Description Section (if exists)
+      if (item.description) {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Description</div>
+            <div class="view-description">${renderDescription(item.description)}</div>
+          </div>
+        `;
+      }
+
+      // Assignment & Dates Section
+      html += `
+        <div class="view-section">
+          <div class="view-section-title">Assignment & Dates</div>
+          <div class="view-grid">
+            <div class="view-field">
+              <div class="view-field-label">Created By</div>
+              <div class="view-field-value">${item.createdBy || 'N/A'}</div>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Created Date</div>
+              <div class="view-field-value">${item.creationDate || 'N/A'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Type-specific fields
+      const typeSpecificHtml = getRenderTypeSpecificFields(item, type);
+      if (typeSpecificHtml) {
+        html += typeSpecificHtml;
+      }
+
+      // JIRA Link Section
+      if (item.jiraLink) {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Links</div>
+            <div class="view-grid">
+              <div class="view-field">
+                <div class="view-field-label">JIRA Link</div>
+                <div class="view-field-value">
+                  <a href="${item.jiraLink}" target="_blank" rel="noopener noreferrer" class="view-link">🔗 View in JIRA</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('ticketContent').innerHTML = html;
+    }
+
+    function getTypeLabel(type) {
+      const labels = {
+        'defect': '🐛 Defect',
+        'cr': '📝 Change Request',
+        'intake': '📥 Intake',
+        'story': '📖 Story',
+        'epic': '🎯 Epic',
+        'task': '✓ Task',
+        'resolved': 'Resolved Item'
+      };
+      return labels[type] || type;
+    }
+
+    function getIdLabel(type) {
+      const idLabels = {
+        'defect': 'Defect ID',
+        'cr': 'Change Request ID',
+        'intake': 'Intake ID',
+        'story': 'Story ID',
+        'epic': 'Epic ID',
+        'task': 'Task ID',
+        'resolved': 'Resolved Item ID'
+      };
+      return idLabels[type] || 'ID';
+    }
+
+    function getRenderTypeSpecificFields(item, type) {
+      let html = '';
+
+      // Defect-specific fields
+      if (type === 'defect') {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Defect Details</div>
+            <div class="view-grid">
+              ${item.component ? `<div class="view-field"><div class="view-field-label">Component</div><div class="view-field-value">${item.component}</div></div>` : ''}
+              ${item.severity ? `<div class="view-field"><div class="view-field-label">Severity</div><div class="view-field-value">${item.severity}</div></div>` : ''}
+              ${item.environment ? `<div class="view-field"><div class="view-field-label">Environment</div><div class="view-field-value">${item.environment}</div></div>` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      // Change Request-specific fields
+      if (type === 'cr') {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Change Request Details</div>
+            <div class="view-grid">
+              ${item.changeType ? `<div class="view-field"><div class="view-field-label">Change Type</div><div class="view-field-value">${item.changeType}</div></div>` : ''}
+              ${item.impactLevel ? `<div class="view-field"><div class="view-field-label">Impact Level</div><div class="view-field-value">${item.impactLevel}</div></div>` : ''}
+              ${item.affectedSystems ? `<div class="view-field"><div class="view-field-label">Affected Systems</div><div class="view-field-value">${item.affectedSystems}</div></div>` : ''}
+              ${item.riskLevel ? `<div class="view-field"><div class="view-field-label">Risk Level</div><div class="view-field-value">${item.riskLevel}</div></div>` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      // Resolved-specific fields
+      if (type === 'resolved') {
+        const typeIcons = { defect: '🐛', cr: '📝', intake: '📥', story: '📖', epic: '🎯', task: '✓' };
+        const typeLabels = { defect: 'Defect', cr: 'Change Request', intake: 'Intake', story: 'Story', epic: 'Epic', task: 'Task' };
+        const icon = typeIcons[item.type] || '✅';
+        const label = typeLabels[item.type] || 'Resolved Item';
+        
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Resolution Details</div>
+            <div class="view-grid">
+              <div class="view-field">
+                <div class="view-field-label">Original Type</div>
+                <div class="view-field-value">${icon} ${label}</div>
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Resolved By</div>
+                <div class="view-field-value">${item.resolvedBy || 'N/A'}</div>
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Resolved Date</div>
+                <div class="view-field-value">${item.resolvedDate || 'N/A'}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
+    function renderActionButtons(type) {
+      const container = document.getElementById('actionButtons');
+      if (!container) return;
+
+      let buttons = '';
+
+      if (type !== 'resolved') {
+        buttons += `<button class="btn btn-secondary" onclick="startEditMode()">✏️ Edit</button>`;
+        buttons += `<button class="btn btn-secondary" onclick="resolveCurrentTicket()">✅ Resolve</button>`;
+        
+        // Add move buttons for CR and intake
+        if (type === 'cr') {
+          buttons += `<button class="btn btn-secondary" onclick="moveCRToIntake()">→ Move to Intake</button>`;
+        } else if (type === 'intake') {
+          buttons += `<button class="btn btn-secondary" onclick="moveIntakeToCR()">→ Move to CR</button>`;
+        }
+      }
+
+      buttons += `<button class="btn btn-danger" onclick="deleteCurrentTicket()">🗑️ Delete</button>`;
+      container.innerHTML = buttons;
+    }
+
+    function startEditMode() {
+      if (!window.currentTicket) return;
+      const { item, type } = window.currentTicket;
+      renderEditForm(item, type);
+    }
+
+    function renderEditForm(item, type) {
+      const content = document.getElementById('ticketContent');
+      if (!content) return;
+
+      const priorityOptions = ['Critical', 'High', 'Medium', 'Low'].map(value => `
+        <option value="${value}" ${item.priority === value ? 'selected' : ''}>${value}</option>
+      `).join('');
+
+      const statusOptions = ['Not Started','On Hold','Blocked','In Progress','Code Review/Migration','Ready for Retest','In QA testing','Await UAT Verification','Await PROD Verification','Await PROD Migration','Failed','Resolved','Triage','Withdrawn','Rejected','Deferred','Done'].map(value => `
+        <option value="${value}" ${item.status === value ? 'selected' : ''}>${value}</option>
+      `).join('');
+
+      let html = `
+        <div class="view-section">
+          <div class="view-section-title">Edit ${getTypeLabel(type)}</div>
+          <div class="view-grid edit-grid">
+            <div class="view-field">
+              <div class="view-field-label">JIRA ID</div>
+              <input type="text" id="editJiraId" class="form-input" value="${item.jiraId || ''}" readonly />
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Title</div>
+              <input type="text" id="editTitle" class="form-input" value="${item.title || ''}" />
+            </div>
+            <div class="view-field view-field-full">
+              <div class="view-field-label">Description</div>
+              <textarea id="editDescription" class="form-input" style="min-height: 120px;">${escapeDescriptionText(item.description)}</textarea>
+            </div>
+            <div class="view-field">
+              <label class="view-field-label" for="editApplication">Application</label>
+              <select id="editApplication" class="form-input">
+                <option value="PUB" ${!item.application || item.application === 'PUB' ? 'selected' : ''}>PUB</option>
+                <option value="EDCA" ${item.application === 'EDCA' ? 'selected' : ''}>EDCA</option>
+              </select>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Priority</div>
+              <select id="editPriority" class="form-input">${priorityOptions}</select>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Status</div>
+              <select id="editStatus" class="form-input">${statusOptions}</select>
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Assignee</div>
+              <input type="text" id="editAssignee" class="form-input" value="${item.assignee || ''}" />
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">Due Date</div>
+              <input type="date" id="editDueDate" class="form-input" value="${item.dueDate || ''}" />
+            </div>
+            <div class="view-field">
+              <div class="view-field-label">JIRA Link</div>
+              <input type="url" id="editJiraLink" class="form-input" value="${item.jiraLink || ''}" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      html += renderEditTypeSpecificFields(item, type);
+      html += `
+        <div class="view-section view-section-actions">
+          <button class="btn btn-secondary" onclick="cancelEditMode()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveTicketEdits()">Save Changes</button>
+        </div>
+      `;
+
+      content.innerHTML = html;
+    }
+
+    function renderEditTypeSpecificFields(item, type) {
+      let html = '';
+
+      if (type === 'defect') {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Defect Details</div>
+            <div class="view-grid">
+              <div class="view-field">
+                <div class="view-field-label">Component</div>
+                <input type="text" id="editComponent" class="form-input" value="${item.component || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Severity</div>
+                <input type="text" id="editSeverity" class="form-input" value="${item.severity || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Environment</div>
+                <input type="text" id="editEnvironment" class="form-input" value="${item.environment || ''}" />
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === 'cr') {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Change Request Details</div>
+            <div class="view-grid">
+              <div class="view-field">
+                <div class="view-field-label">Change Type</div>
+                <input type="text" id="editChangeType" class="form-input" value="${item.changeType || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Impact Level</div>
+                <input type="text" id="editImpactLevel" class="form-input" value="${item.impactLevel || ''}" />
+              </div>
+              <div class="view-field view-field-full">
+                <div class="view-field-label">Affected Systems</div>
+                <input type="text" id="editAffectedSystems" class="form-input" value="${item.affectedSystems || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Risk Level</div>
+                <input type="text" id="editRiskLevel" class="form-input" value="${item.riskLevel || ''}" />
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === 'intake') {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Intake Details</div>
+            <div class="view-grid">
+              <div class="view-field">
+                <div class="view-field-label">Intake Type</div>
+                <input type="text" id="editIntakeType" class="form-input" value="${item.intakeType || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Business Case</div>
+                <input type="text" id="editBusinessCase" class="form-input" value="${item.businessCase || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Requested By</div>
+                <input type="text" id="editRequestedBy" class="form-input" value="${item.requestedBy || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Start Date</div>
+                <input type="date" id="editStartDate" class="form-input" value="${item.startDate || ''}" />
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === 'story') {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Story Details</div>
+            <div class="view-grid">
+              <div class="view-field">
+                <div class="view-field-label">Story Points</div>
+                <input type="text" id="editStoryPoints" class="form-input" value="${item.storyPoints || ''}" />
+              </div>
+              <div class="view-field view-field-full">
+                <div class="view-field-label">Acceptance Criteria</div>
+                <input type="text" id="editAcceptanceCriteria" class="form-input" value="${item.acceptanceCriteria || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Related Epic</div>
+                <input type="text" id="editRelatedEpic" class="form-input" value="${item.relatedEpic || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Start Date</div>
+                <input type="date" id="editStartDate" class="form-input" value="${item.startDate || ''}" />
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === 'epic') {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Epic Details</div>
+            <div class="view-grid">
+              <div class="view-field">
+                <div class="view-field-label">Initiative</div>
+                <input type="text" id="editInitiative" class="form-input" value="${item.initiative || ''}" />
+              </div>
+              <div class="view-field view-field-full">
+                <div class="view-field-label">Scope</div>
+                <input type="text" id="editScope" class="form-input" value="${item.scope || ''}" />
+              </div>
+              <div class="view-field view-field-full">
+                <div class="view-field-label">Business Impact</div>
+                <input type="text" id="editBusinessImpact" class="form-input" value="${item.businessImpact || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Stakeholders</div>
+                <input type="text" id="editStakeholders" class="form-input" value="${item.stakeholders || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Start Date</div>
+                <input type="date" id="editStartDate" class="form-input" value="${item.startDate || ''}" />
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === 'task') {
+        html += `
+          <div class="view-section">
+            <div class="view-section-title">Task Details</div>
+            <div class="view-grid">
+              <div class="view-field">
+                <div class="view-field-label">Task Type</div>
+                <input type="text" id="editTaskType" class="form-input" value="${item.taskType || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Effort Estimate</div>
+                <input type="text" id="editEffortEstimate" class="form-input" value="${item.effortEstimate || ''}" />
+              </div>
+              <div class="view-field view-field-full">
+                <div class="view-field-label">Acceptance Criteria</div>
+                <input type="text" id="editAcceptanceCriteria" class="form-input" value="${item.acceptanceCriteria || ''}" />
+              </div>
+              <div class="view-field view-field-full">
+                <div class="view-field-label">Dependencies</div>
+                <input type="text" id="editDependencies" class="form-input" value="${item.dependencies || ''}" />
+              </div>
+              <div class="view-field">
+                <div class="view-field-label">Related Item</div>
+                <input type="text" id="editRelatedItem" class="form-input" value="${item.relatedItem || ''}" />
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
+    async function saveTicketEdits() {
+      if (!window.currentTicket) return;
+      const { item, type } = window.currentTicket;
+
+      const updated = { ...item };
+      updated.title = document.getElementById('editTitle')?.value.trim() || updated.title;
+      updated.description = document.getElementById('editDescription')?.value.trim() || updated.description;
+      updated.priority = document.getElementById('editPriority')?.value || updated.priority;
+      updated.application = document.getElementById('editApplication').value;
+      updated.status = document.getElementById('editStatus')?.value || updated.status;
+      updated.assignee = document.getElementById('editAssignee')?.value.trim() || updated.assignee;
+      updated.dueDate = document.getElementById('editDueDate')?.value || updated.dueDate;
+      updated.jiraLink = document.getElementById('editJiraLink')?.value.trim() || updated.jiraLink;
+
+      if (type === 'defect') {
+        updated.component = document.getElementById('editComponent')?.value.trim() || updated.component;
+        updated.severity = document.getElementById('editSeverity')?.value || updated.severity;
+        updated.environment = document.getElementById('editEnvironment')?.value || updated.environment;
+      }
+      if (type === 'cr') {
+        updated.changeType = document.getElementById('editChangeType')?.value || updated.changeType;
+        updated.impactLevel = document.getElementById('editImpactLevel')?.value || updated.impactLevel;
+        updated.affectedSystems = document.getElementById('editAffectedSystems')?.value.trim() || updated.affectedSystems;
+        updated.riskLevel = document.getElementById('editRiskLevel')?.value || updated.riskLevel;
+      }
+      if (type === 'intake') {
+        updated.intakeType = document.getElementById('editIntakeType')?.value || updated.intakeType;
+        updated.businessCase = document.getElementById('editBusinessCase')?.value.trim() || updated.businessCase;
+        updated.requestedBy = document.getElementById('editRequestedBy')?.value.trim() || updated.requestedBy;
+        updated.startDate = document.getElementById('editStartDate')?.value || updated.startDate;
+      }
+      if (type === 'story') {
+        updated.storyPoints = document.getElementById('editStoryPoints')?.value || updated.storyPoints;
+        updated.acceptanceCriteria = document.getElementById('editAcceptanceCriteria')?.value.trim() || updated.acceptanceCriteria;
+        updated.relatedEpic = document.getElementById('editRelatedEpic')?.value.trim() || updated.relatedEpic;
+        updated.startDate = document.getElementById('editStartDate')?.value || updated.startDate;
+      }
+      if (type === 'epic') {
+        updated.initiative = document.getElementById('editInitiative')?.value.trim() || updated.initiative;
+        updated.scope = document.getElementById('editScope')?.value.trim() || updated.scope;
+        updated.businessImpact = document.getElementById('editBusinessImpact')?.value.trim() || updated.businessImpact;
+        updated.stakeholders = document.getElementById('editStakeholders')?.value.trim() || updated.stakeholders;
+        updated.startDate = document.getElementById('editStartDate')?.value || updated.startDate;
+      }
+      if (type === 'task') {
+        updated.taskType = document.getElementById('editTaskType')?.value || updated.taskType;
+        updated.effortEstimate = document.getElementById('editEffortEstimate')?.value || updated.effortEstimate;
+        updated.acceptanceCriteria = document.getElementById('editAcceptanceCriteria')?.value.trim() || updated.acceptanceCriteria;
+        updated.dependencies = document.getElementById('editDependencies')?.value.trim() || updated.dependencies;
+        updated.relatedItem = document.getElementById('editRelatedItem')?.value.trim() || updated.relatedItem;
+        updated.startDate = document.getElementById('editStartDate')?.value || updated.startDate;
+      }
+
+      try {
+        const savedTicket = await AppState.updateTicket(type, updated);
+        window.currentTicket.item = savedTicket;
+        sessionStorage.setItem('viewTicket', JSON.stringify(window.currentTicket));
+        renderTicketDetails(savedTicket, type);
+        renderActionButtons(type);
+      } catch (error) {
+        alert('Error saving changes: ' + error.message);
+      }
+    }
+
+    function cancelEditMode() {
+      if (!window.currentTicket) return;
+      renderTicketDetails(window.currentTicket.item, window.currentTicket.type);
+      renderActionButtons(window.currentTicket.type);
+    }
+
+    async function resolveCurrentTicket() {
+      if (!window.currentTicket) return;
+      const { item, type } = window.currentTicket;
+      if (item.status === 'Resolved') {
+        alert('This item is already resolved.');
+        return;
+      }
+      if (!confirm('Resolve this item and save it to Resolved items?')) return;
+
+      const userJson = sessionStorage.getItem('loggedInUser');
+      const user = userJson ? JSON.parse(userJson) : null;
+      item.status = 'Resolved';
+      item.resolvedDate = new Date().toISOString().split('T')[0];
+      item.resolvedBy = user?.name || 'Unknown';
+
+      try {
+        if (type === 'defect') await api.updateDefect(item.id, item);
+        else if (type === 'cr') await api.updateChangeRequest(item.id, item);
+        else if (type === 'intake') await api.updateIntake(item.id, item);
+        else if (type === 'story') await api.updateStory(item.id, item);
+        else if (type === 'epic') await api.updateEpic(item.id, item);
+        else if (type === 'task') await api.updateTask(item.id, item);
+
+        await api.addResolved({ ...item, type });
+        alert('Item resolved and saved to Resolved items.');
+        goBack();
+      } catch (error) {
+        alert('Error resolving item: ' + error.message);
+      }
+    }
+
+    async function deleteCurrentTicket() {
+      if (!window.currentTicket) return;
+      if (!confirm('Delete this item permanently?')) return;
+      const { item, type } = window.currentTicket;
+
+      try {
+        if (type === 'defect') await api.deleteDefect(item.id);
+        else if (type === 'cr') await api.deleteChangeRequest(item.id);
+        else if (type === 'intake') await api.deleteIntake(item.id);
+        else if (type === 'story') await api.deleteStory(item.id);
+        else if (type === 'epic') await api.deleteEpic(item.id);
+        else if (type === 'task') await api.deleteTask(item.id);
+
+        alert('Item deleted successfully.');
+        goBack();
+      } catch (error) {
+        alert('Error deleting item: ' + error.message);
+      }
+    }
+
+    async function moveCRToIntake() {
+      if (!window.currentTicket) return;
+      const { item, type } = window.currentTicket;
+      
+      if (type !== 'cr') {
+        alert('This action is only available for Change Requests');
+        return;
+      }
+
+      if (!confirm('Move this Change Request to Intake?')) return;
+
+      try {
+        if (typeof api.moveCRToIntake === 'function') {
+          // Using Firestore API
+          await api.moveCRToIntake(item.id);
+        } else {
+          // Fallback for local storage API
+          AppState.moveCRToIntake(item.id);
+        }
+        
+        alert('Change Request moved to Intake successfully.');
+        goBack();
+      } catch (error) {
+        alert('Error moving item: ' + error.message);
+      }
+    }
+
+    async function moveIntakeToCR() {
+      if (!window.currentTicket) return;
+      const { item, type } = window.currentTicket;
+      
+      if (type !== 'intake') {
+        alert('This action is only available for Intakes');
+        return;
+      }
+
+      if (!confirm('Move this Intake to Change Request?')) return;
+
+      try {
+        if (typeof api.moveIntakeToCR === 'function') {
+          // Using Firestore API
+          await api.moveIntakeToCR(item.id);
+        } else {
+          // Fallback for local storage API
+          AppState.moveIntakeToCR(item.id);
+        }
+        
+        alert('Intake moved to Change Request successfully.');
+        goBack();
+      } catch (error) {
+        alert('Error moving item: ' + error.message);
+      }
+    }
+
+    function exportSingleTicket() {
+      if (!window.currentTicket) {
+        alert('No ticket data to export');
+        return;
+      }
+
+      const { item, type } = window.currentTicket;
+      const dataArray = [item];
+      const filename = `${item.jiraId || item.id}_${new Date().toISOString().split('T')[0]}.csv`;
+
+      // CSV export logic (same as in app.js)
+      if (!dataArray || dataArray.length === 0) {
+        alert('No data to export');
+        return;
+      }
+
+      const allKeys = [...new Set(dataArray.flatMap(obj => Object.keys(obj)))];
+      const header = allKeys.join(',');
+      const rows = dataArray.map(obj => {
+        return allKeys.map(key => {
+          const value = obj[key] || '';
+          const escaped = String(value).replace(/"/g, '""');
+          return escaped.includes(',') || escaped.includes('"') || escaped.includes('\n') ? `"${escaped}"` : escaped;
+        }).join(',');
+      });
+
+      const csv = [header, ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function goBack() {
+      sessionStorage.removeItem('viewTicket');
+      window.location.href = 'index.html';
+    }
+
+    function toggleUserMenu() {
+      const menu = document.getElementById('userMenu');
+      const overlay = document.getElementById('userMenuOverlay');
+      
+      menu.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+
+    function closeUserMenu() {
+      const menu = document.getElementById('userMenu');
+      const overlay = document.getElementById('userMenuOverlay');
+      
+      menu.classList.remove('active');
+      overlay.classList.remove('active');
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeView();
+
+      // Initialize theme and logo
+      initializeTheme();
+
+      // Update user info
+      const userJson = sessionStorage.getItem('loggedInUser');
+      if (userJson) {
+        const user = JSON.parse(userJson);
+        document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+        document.getElementById('userName').textContent = user.name;
+        document.getElementById('userMenuAvatar').textContent = user.name.charAt(0).toUpperCase();
+        document.getElementById('userMenuName').textContent = user.name;
+        document.getElementById('userMenuEmail').textContent = user.email;
+      }
+    });
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
+  <script src="api-service.js"></script>
+  <script src="app-firestore.js?v=20261119-description-links"></script>
+  <script src="ticker.js"></script>
+  <script src="tech-news.js"></script>
+</body>
+</html>

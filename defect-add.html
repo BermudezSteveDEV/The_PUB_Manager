@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Defect - PUB Manager</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="apple-mobile-web-app-title" content="PUB Manager" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261119-description-links" />
+  <style>
+    .form-page-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-section {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .form-section-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-lg);
+      color: var(--text-primary);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Header -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-section">
+          <img src="pub-manager-logo.png" alt="PUB Manager" class="header-logo-image">
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <div class="form-page-container">
+      <div class="section-header">
+        <h1>Add New Defect</h1>
+        <p class="section-subtitle">Create and track a new defect in the system</p>
+      </div>
+
+      <form id="defectForm">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h2 class="form-section-title">Basic Information</h2>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label required-field">JIRA ID</label>
+              <input type="text" id="jiraId" class="form-input" placeholder="e.g., PROJ-1234" required>
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required-field">Priority</label>
+              <select id="priority" class="form-input" required>
+                <option value="">Select Priority</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <div class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">JIRA Link</label>
+            <input type="url" id="jiraLink" class="form-input" placeholder="https://jira.example.com/browse/PROJ-1234">
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required-field">Title</label>
+            <input type="text" id="title" class="form-input" placeholder="Brief description of the defect" required>
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="description" class="form-input" placeholder="Detailed description of the defect..." style="resize: vertical; min-height: 120px;"></textarea>
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Application</label>
+            <select id="application" class="form-input">
+              <option value="">-- Not Specified (PUB) --</option>
+              <option value="PUB">PUB</option>
+              <option value="EDCA">EDCA</option>
+            </select>
+            <div class="error-message"></div>
+          </div>
+        </div>
+
+        <!-- Assignment & Timeline -->
+        <div class="form-section">
+          <h2 class="form-section-title">Assignment & Timeline</h2>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label required-field">Assigned To</label>
+              <input type="text" id="assignee" class="form-input" placeholder="Team member name" required>
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="status" class="form-input">
+                <option value="">Select Status</option>
+                <option value="Not Started">Not Started</option>
+                <option value="On Hold">On Hold</option>
+                <option value="Blocked">Blocked</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Code Review/Migration">Code Review/Migration</option>
+                <option value="Ready for Retest">Ready for Retest</option>
+                <option value="In QA testing">In QA testing</option>
+                <option value="Await UAT Verification">Await UAT Verification</option>
+                <option value="Await PROD Verification">Await PROD Verification</option>
+                <option value="Await PROD Migration">Await PROD Migration</option>
+                <option value="Failed">Failed</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Triage">Triage</option>
+                <option value="Withdrawn">Withdrawn</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Deferred">Deferred</option>
+              </select>
+              <div class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label">Due Date</label>
+              <input type="date" id="dueDate" class="form-input">
+              <div class="error-message"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Details -->
+        <div class="form-section">
+          <h2 class="form-section-title">Additional Details</h2>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label">Component/Module</label>
+              <input type="text" id="component" class="form-input" placeholder="e.g., Authentication, Database">
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Severity</label>
+              <select id="severity" class="form-input">
+                <option value="">Select Severity</option>
+                <option value="Blocker">Blocker</option>
+                <option value="Major">Major</option>
+                <option value="Minor">Minor</option>
+                <option value="Trivial">Trivial</option>
+              </select>
+              <div class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Environment</label>
+            <select id="environment" class="form-input">
+              <option value="">Select Environment</option>
+              <option value="Development">Development</option>
+              <option value="Staging">Staging</option>
+              <option value="Production">Production</option>
+              <option value="QA">QA</option>
+            </select>
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Steps to Reproduce</label>
+            <textarea id="stepsToReproduce" class="form-input" placeholder="Step-by-step instructions..." style="resize: vertical; min-height: 100px;"></textarea>
+            <div class="error-message"></div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-section" style="border: none; box-shadow: none; padding: 0;">
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="goBack()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Defect</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Check authentication
+    if (!sessionStorage.getItem('loggedInUser')) {
+      window.location.href = 'login.html';
+    }
+
+    // Form submission
+    document.getElementById('defectForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      // Validate form
+      if (!validateForm()) {
+        return;
+      }
+
+      try {
+        const submitBtn = e.target.querySelector('[type="submit"]');
+        submitBtn.disabled = true;
+
+        // Create defect object
+        const defect = {
+          jiraId: document.getElementById('jiraId').value.trim(),
+          jiraLink: document.getElementById('jiraLink').value.trim(),
+          priority: document.getElementById('priority').value,
+          title: document.getElementById('title').value.trim(),
+          description: document.getElementById('description').value.trim(),
+          application: document.getElementById('application').value || 'PUB',
+          status: document.getElementById('status').value,
+          assignee: document.getElementById('assignee').value.trim(),
+          dueDate: document.getElementById('dueDate').value,
+          component: document.getElementById('component').value.trim(),
+          severity: document.getElementById('severity').value,
+          environment: document.getElementById('environment').value,
+          stepsToReproduce: document.getElementById('stepsToReproduce').value.trim()
+        };
+
+        // Call Firestore API
+        await api.addDefect(defect);
+
+        // Show success and redirect
+        alert('Defect created successfully!');
+        window.location.href = 'index.html';
+      } catch (error) {
+        alert('Error: ' + error.message);
+        e.target.querySelector('[type="submit"]').disabled = false;
+      }
+    });
+
+    function validateForm() {
+      clearErrors();
+
+      const jiraId = document.getElementById('jiraId').value.trim();
+      const priority = document.getElementById('priority').value;
+      const title = document.getElementById('title').value.trim();
+      const assignee = document.getElementById('assignee').value.trim();
+
+      let isValid = true;
+
+      if (!jiraId) {
+        showError('jiraId', 'JIRA ID is required');
+        isValid = false;
+      }
+
+      if (!priority) {
+        showError('priority', 'Priority is required');
+        isValid = false;
+      }
+
+      if (!title) {
+        showError('title', 'Title is required');
+        isValid = false;
+      }
+
+      if (!assignee) {
+        showError('assignee', 'Assignee is required');
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorDiv = field.parentElement.querySelector('.error-message');
+      errorDiv.textContent = message;
+      errorDiv.classList.add('show');
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.error-message').forEach(el => {
+        el.classList.remove('show');
+        el.textContent = '';
+      });
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+  </script>
+
+  <style>
+    .required-field::after {
+      content: ' *';
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
+  <script src="api-service.js"></script>
+  <script src="app-firestore.js?v=20261119-description-links"></script>
+</body>
+</html>

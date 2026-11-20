@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PUB Manager</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="apple-mobile-web-app-title" content="PUB Manager" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261119-description-links" />
+</head>
+<body>
+  <div class="stock-ticker" id="stockTicker" aria-label="Stock ticker" hidden></div>
+  <div class="weather-ticker" id="weatherTicker" aria-label="Current weather ticker"></div>
+  <div class="tech-news-ticker" id="techNewsTicker" role="region" aria-label="Technology news from TLDR">
+    <a class="tech-news-label" href="https://tldr.tech/" target="_blank" rel="noopener noreferrer">TECH NEWS · TLDR</a>
+    <div class="tech-news-viewport"></div>
+    <button class="tech-news-pause" type="button" aria-label="Pause tech news scrolling" aria-pressed="false" hidden>Pause</button>
+  </div>
+
+  <!-- Navigation Header -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-section">
+          <img src="pub-manager-logo.png" alt="PUB Manager" class="header-logo-image">
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="header-icon-btn" id="themeToggleBtn" type="button" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
+          <span class="header-icon-btn-symbol" id="themeToggleIcon">🌙</span>
+          <span class="header-icon-btn-label" id="themeToggleLabel">Dark</span>
+        </button>
+        <div class="user-profile-wrapper">
+          <button class="user-profile-btn" onclick="toggleUserMenu(event)" title="User Profile">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span class="user-name" id="userName">User</span>
+            <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          
+          <!-- User Dropdown Menu -->
+          <div class="user-menu" id="userMenu" onclick="event.stopPropagation()">
+            <div class="user-menu-header">
+              <div class="user-menu-avatar" id="userMenuAvatar">U</div>
+              <div class="user-menu-info">
+                <div class="user-menu-name" id="userMenuName">User Name</div>
+                <div class="user-menu-email" id="userMenuEmail">email@example.com</div>
+                <div class="user-menu-manager" id="userMenuManager">Manager: -</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="header-utility-bar">
+      <div class="world-clocks" id="worldClocks" aria-label="World clocks">
+        <div class="world-clock-card">
+          <span class="world-clock-city">Philadelphia</span>
+          <span class="world-clock-time" id="clock-philadelphia">--:--</span>
+        </div>
+        <div class="world-clock-card">
+          <span class="world-clock-city">Chicago</span>
+          <span class="world-clock-time" id="clock-chicago">--:--</span>
+        </div>
+        <div class="world-clock-card">
+          <span class="world-clock-city">Los Angeles</span>
+          <span class="world-clock-time" id="clock-los-angeles">--:--</span>
+        </div>
+        <div class="world-clock-card">
+          <span class="world-clock-city">London</span>
+          <span class="world-clock-time" id="clock-london">--:--</span>
+        </div>
+        <div class="world-clock-card">
+          <span class="world-clock-city">Mumbai</span>
+          <span class="world-clock-time" id="clock-mumbai">--:--</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <!-- Sidebar Toggle Button -->
+      <div class="sidebar-header">
+        <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Core Items -->
+        <div class="nav-section">
+          <a href="#" class="nav-item active" onclick="showSection('dashboard', event)">
+            <span class="nav-icon">📈</span>
+            <span class="nav-label">Dashboard</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('searchAll', event)">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-label">Search All</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('defects', event)">
+            <span class="nav-icon">🐛</span>
+            <span class="nav-label">Defects</span>
+            <span class="nav-badge" id="defectBadge">0</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('changeRequests', event)">
+            <span class="nav-icon">📝</span>
+            <span class="nav-label">Change Requests</span>
+            <span class="nav-badge" id="crBadge">0</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('resolved', event)">
+            <span class="nav-icon">✅</span>
+            <span class="nav-label">Resolved Items</span>
+            <span class="nav-badge" id="resolvedBadge">0</span>
+          </a>
+        </div>
+
+        <!-- Backlog Section -->
+        <div style="height: 1px; background: var(--border); margin: var(--spacing-md) 0;"></div>
+        <button class="nav-section-header" onclick="toggleNavSection(this)">
+          <span class="section-toggle">▼</span>
+          <span style="flex: 1; text-align: left;">Backlog</span>
+        </button>
+        <div class="nav-section nav-collapsible" id="backlogSection">
+          <a href="#" class="nav-item" onclick="showSection('intakes', event)">
+            <span class="nav-icon">📥</span>
+            <span class="nav-label">Intakes</span>
+            <span class="nav-badge" id="intakeBadge">0</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('stories', event)">
+            <span class="nav-icon">📖</span>
+            <span class="nav-label">Stories</span>
+            <span class="nav-badge" id="storyBadge">0</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('epics', event)">
+            <span class="nav-icon">🎯</span>
+            <span class="nav-label">Epics</span>
+            <span class="nav-badge" id="epicBadge">0</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('tasks', event)">
+            <span class="nav-icon">✓</span>
+            <span class="nav-label">Tasks</span>
+            <span class="nav-badge" id="taskBadge">0</span>
+          </a>
+        </div>
+
+        <!-- User Settings Section -->
+        <div style="height: 1px; background: var(--border); margin: var(--spacing-md) 0;"></div>
+        <a href="#" class="nav-item" onclick="showSection('myProfile', event)">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">My Profile</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showSection('editProfile', event)">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Edit Profile</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showSection('myRoles', event)">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-label">My Roles</span>
+        </a>
+
+        <!-- Logout (Always at bottom) -->
+        <div style="flex: 1;"></div>
+        <div style="height: 1px; background: var(--border); margin: var(--spacing-md) 0;"></div>
+        <button class="nav-item logout-item" onclick="logout()" style="border-left: none; margin-bottom: var(--spacing-md);">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Dashboard Section -->
+      <section id="dashboard-section" class="section active">
+        <div class="mobile-greeting">
+          <span class="mobile-greeting-date" id="mobileGreetingDate"></span>
+          <h1 class="mobile-greeting-title" id="mobileGreetingTitle">Welcome</h1>
+        </div>
+        <div class="section-header dashboard-header">
+          <h1>Dashboard</h1>
+          <p class="section-subtitle">Overview of your PUB Manager activities</p>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Stats Cards -->
+          <div class="stat-card clickable" onclick="showSection('defects', event)" style="cursor: pointer;" title="View all defects">
+            <div class="stat-icon defect">🐛</div>
+            <div class="stat-content">
+              <div class="stat-label">Open Defects</div>
+              <div class="stat-value" id="openDefectsCount">0</div>
+            </div>
+          </div>
+
+          <div class="stat-card clickable" onclick="showSection('changeRequests', event)" style="cursor: pointer;" title="View all change requests">
+            <div class="stat-icon cr">📝</div>
+            <div class="stat-content">
+              <div class="stat-label">Open Change Requests</div>
+              <div class="stat-value" id="openCRCount">0</div>
+            </div>
+          </div>
+
+          <div class="stat-card clickable" onclick="showSection('resolved', event)" style="cursor: pointer;" title="View all resolved items">
+            <div class="stat-icon resolved">✅</div>
+            <div class="stat-content">
+              <div class="stat-label">Resolved Items</div>
+              <div class="stat-value" id="resolvedCount">0</div>
+            </div>
+          </div>
+
+          <div class="stat-card clickable" onclick="openHighPriorityModal()" style="cursor: pointer;" title="View high priority items">
+            <div class="stat-icon priority">⚡</div>
+            <div class="stat-content">
+              <div class="stat-label">High Priority Items</div>
+              <div class="stat-value" id="highPriorityCount">0</div>
+            </div>
+          </div>
+
+          <div class="stat-card rto-card">
+            <div class="stat-icon rto">🏢</div>
+            <div class="stat-content">
+              <div class="stat-label">RTO Average (Current Month)</div>
+              <div class="stat-value" id="rtoAverageValue">0.0</div>
+              <button class="btn btn-secondary rto-open-btn" type="button" onclick="openRTOModal()">Track Days</button>
+            </div>
+          </div>
+
+          <div class="stat-card clickable" onclick="showSection('calendar', event)" style="cursor: pointer;" title="Open calendar">
+            <div class="stat-icon">📅</div>
+            <div class="stat-content">
+              <div class="stat-label">Calendar</div>
+              <div class="stat-value">Open</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions-section">
+          <h2>Quick Actions</h2>
+          <div class="quick-actions-grid">
+            <button class="action-card" onclick="navigateToPage('defect-add.html')">
+              <span class="action-icon">➕</span>
+              <span class="action-label">Add Defect</span>
+            </button>
+            <button class="action-card" onclick="navigateToPage('cr-add.html')">
+              <span class="action-icon">➕</span>
+              <span class="action-label">Add Change Request</span>
+            </button>
+            <button class="action-card" onclick="showSection('defects')">
+              <span class="action-icon">🔍</span>
+              <span class="action-label">View All Defects</span>
+            </button>
+            <button class="action-card" onclick="showSection('changeRequests')">
+              <span class="action-icon">🔍</span>
+              <span class="action-label">View All CRs</span>
+            </button>
+            <button class="action-card" onclick="navigateToPage('intake-add.html')">
+              <span class="action-icon">➕</span>
+              <span class="action-label">Add Intake</span>
+            </button>
+            <button class="action-card" onclick="navigateToPage('story-add.html')">
+              <span class="action-icon">➕</span>
+              <span class="action-label">Add Story</span>
+            </button>
+            <button class="action-card" onclick="navigateToPage('epic-add.html')">
+              <span class="action-icon">➕</span>
+              <span class="action-label">Add Epic</span>
+            </button>
+            <button class="action-card" onclick="navigateToPage('task-add.html')">
+              <span class="action-icon">➕</span>
+              <span class="action-label">Add Task</span>
+            </button>
+            <button class="action-card" onclick="openTestingEnvironmentsModal()">
+              <span class="action-icon">🌐</span>
+              <span class="action-label">PUB Testing Environments</span>
+            </button>
+            <button class="action-card" onclick="openEdcaEnvironmentsModal()">
+              <span class="action-icon">🌐</span>
+              <span class="action-label">eDCA Test Environments</span>
+            </button>
+            <button class="action-card" onclick="openSiteLinksModal()">
+              <span class="action-icon">🔗</span>
+              <span class="action-label">Site Links</span>
+            </button>
+            <button class="action-card" onclick="openFusionModal()">
+              <span class="action-icon">🧭</span>
+              <span class="action-label">Fusion</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+            <h2>Recent Activity</h2>
+            <button class="btn btn-secondary" onclick="AppState.loadRecentItems()" style="font-size: 0.9rem; padding: var(--spacing-sm) var(--spacing-md);">🔄 Refresh</button>
+          </div>
+          <div class="activity-list" id="activityList">
+            <p class="empty-state">No recent activity yet</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Search All Section -->
+      <section id="searchAll-section" class="section">
+        <div class="section-header">
+          <h1>Search All Tickets</h1>
+          <p class="section-subtitle">Find tickets across all work types by JIRA number or assignee</p>
+        </div>
+
+        <div class="section-actions">
+          <input type="search" id="globalTicketSearch" class="search-input" placeholder="Search by JIRA number or assignee..." autocomplete="off" />
+        </div>
+
+        <div class="items-container" id="globalSearchResults">
+          <p class="empty-state">Enter a JIRA number or assignee to search all tickets.</p>
+        </div>
+      </section>
+
+      <!-- Defects Section -->
+      <section id="defects-section" class="section">
+        <div class="section-header">
+          <h1>Defects</h1>
+          <p class="section-subtitle">Manage and track all defects</p>
+        </div>
+
+        <div class="section-actions">
+          <input type="text" id="defectSearchId" class="search-input" placeholder="Search by Defect ID..." />
+          <input type="text" id="defectSearchJira" class="search-input" placeholder="Search by JIRA ID..." />
+          <select id="defectStatusFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="Not Started">Not Started</option>
+            <option value="On Hold">On Hold</option>
+            <option value="Blocked">Blocked</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Code Review/Migration">Code Review/Migration</option>
+            <option value="Ready for Retest">Ready for Retest</option>
+            <option value="In QA testing">In QA testing</option>
+            <option value="Await UAT Verification">Await UAT Verification</option>
+            <option value="Await PROD Verification">Await PROD Verification</option>
+            <option value="Await PROD Migration">Await PROD Migration</option>
+            <option value="Failed">Failed</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Triage">Triage</option>
+            <option value="Withdrawn">Withdrawn</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Deferred">Deferred</option>
+          </select>
+          <select id="defectSortJira" class="filter-select">
+            <option value="desc" selected>Highest to Lowest</option>
+            <option value="asc">Lowest to Highest</option>
+          </select>
+          <button class="btn btn-primary" onclick="navigateToPage('defect-add.html')">➕ Add Defect</button>
+          <button class="btn btn-secondary" onclick="exportDefects()">📥 Export CSV</button>
+        </div>
+
+        <div class="items-container" id="defectsList">
+          <p class="empty-state">No defects yet. Create your first defect to get started.</p>
+        </div>
+      </section>
+
+      <!-- Change Requests Section -->
+      <section id="changeRequests-section" class="section">
+        <div class="section-header">
+          <h1>Change Requests</h1>
+          <p class="section-subtitle">Manage and track all change requests</p>
+        </div>
+
+        <div class="section-actions">
+          <input type="text" id="crSearchId" class="search-input" placeholder="Search by CR ID..." />
+          <input type="text" id="crSearchJira" class="search-input" placeholder="Search by JIRA ID..." />
+          <select id="crStatusFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="Not Started">Not Started</option>
+            <option value="On Hold">On Hold</option>
+            <option value="Blocked">Blocked</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Code Review/Migration">Code Review/Migration</option>
+            <option value="Ready for Retest">Ready for Retest</option>
+            <option value="In QA testing">In QA testing</option>
+            <option value="Await UAT Verification">Await UAT Verification</option>
+            <option value="Await PROD Verification">Await PROD Verification</option>
+            <option value="Await PROD Migration">Await PROD Migration</option>
+            <option value="Failed">Failed</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Triage">Triage</option>
+            <option value="Withdrawn">Withdrawn</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Deferred">Deferred</option>
+          </select>
+          <select id="crSortJira" class="filter-select">
+            <option value="desc" selected>Highest to Lowest</option>
+            <option value="asc">Lowest to Highest</option>
+          </select>
+          <button class="btn btn-primary" onclick="navigateToPage('cr-add.html')">➕ Add CR</button>
+          <button class="btn btn-secondary" onclick="exportChangeRequests()">📥 Export CSV</button>
+        </div>
+
+        <div class="items-container" id="crsList">
+          <p class="empty-state">No change requests yet. Create your first CR to get started.</p>
+        </div>
+      </section>
+
+      <!-- Intakes Section -->
+      <section id="intakes-section" class="section">
+        <div class="section-header">
+          <h1>Intakes</h1>
+          <p class="section-subtitle">Manage and track all intake requests</p>
+        </div>
+
+        <div class="section-actions">
+          <input type="text" id="intakeSearchId" class="search-input" placeholder="Search by Intake ID..." />
+          <input type="text" id="intakeSearchJira" class="search-input" placeholder="Search by JIRA ID..." />
+          <select id="intakeStatusFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="In Review">In Review</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Completed">Completed</option>
+          </select>
+          <button class="btn btn-primary" onclick="navigateToPage('intake-add.html')">➕ Add Intake</button>
+          <button class="btn btn-secondary" onclick="exportIntakes()">📥 Export CSV</button>
+        </div>
+
+        <div class="items-container" id="intakesList">
+          <p class="empty-state">No intakes yet. Create your first intake to get started.</p>
+        </div>
+      </section>
+
+      <!-- Stories Section -->
+      <section id="stories-section" class="section">
+        <div class="section-header">
+          <h1>Stories</h1>
+          <p class="section-subtitle">Manage and track all user stories</p>
+        </div>
+
+        <div class="section-actions">
+          <input type="text" id="storySearchId" class="search-input" placeholder="Search by Story ID..." />
+          <input type="text" id="storySearchJira" class="search-input" placeholder="Search by JIRA ID..." />
+          <select id="storyStatusFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="In Review">In Review</option>
+            <option value="Testing">Testing</option>
+            <option value="Completed">Completed</option>
+            <option value="On Hold">On Hold</option>
+          </select>
+          <button class="btn btn-primary" onclick="navigateToPage('story-add.html')">➕ Add Story</button>
+          <button class="btn btn-secondary" onclick="exportStories()">📥 Export CSV</button>
+        </div>
+
+        <div class="items-container" id="storiesList">
+          <p class="empty-state">No stories yet. Create your first story to get started.</p>
+        </div>
+      </section>
+
+      <!-- Epics Section -->
+      <section id="epics-section" class="section">
+        <div class="section-header">
+          <h1>Epics</h1>
+          <p class="section-subtitle">Manage and track all epics</p>
+        </div>
+
+        <div class="section-actions">
+          <input type="text" id="epicSearchId" class="search-input" placeholder="Search by Epic ID..." />
+          <input type="text" id="epicSearchJira" class="search-input" placeholder="Search by JIRA ID..." />
+          <select id="epicStatusFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="Planning">Planning</option>
+            <option value="In Progress">In Progress</option>
+            <option value="In Review">In Review</option>
+            <option value="Completed">Completed</option>
+            <option value="On Hold">On Hold</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <button class="btn btn-primary" onclick="navigateToPage('epic-add.html')">➕ Add Epic</button>
+          <button class="btn btn-secondary" onclick="exportEpics()">📥 Export CSV</button>
+        </div>
+
+        <div class="items-container" id="epicsList">
+          <p class="empty-state">No epics yet. Create your first epic to get started.</p>
+        </div>
+      </section>
+
+      <!-- Tasks Section -->
+      <section id="tasks-section" class="section">
+        <div class="section-header">
+          <h1>Tasks</h1>
+          <p class="section-subtitle">Manage and track all tasks</p>
+        </div>
+
+        <div class="section-actions">
+          <input type="text" id="taskSearchId" class="search-input" placeholder="Search by Task ID..." />
+          <input type="text" id="taskSearchJira" class="search-input" placeholder="Search by JIRA ID..." />
+          <select id="taskStatusFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="To Do">To Do</option>
+            <option value="In Progress">In Progress</option>
+            <option value="In Review">In Review</option>
+            <option value="Done">Done</option>
+            <option value="Blocked">Blocked</option>
+          </select>
+          <button class="btn btn-primary" onclick="navigateToPage('task-add.html')">➕ Add Task</button>
+          <button class="btn btn-secondary" onclick="exportTasks()">📥 Export CSV</button>
+        </div>
+
+        <div class="items-container" id="tasksList">
+          <p class="empty-state">No tasks yet. Create your first task to get started.</p>
+        </div>
+      </section>
+
+      <!-- My Profile Section -->
+      <section id="myProfile-section" class="section">
+        <div class="section-header">
+          <h1>My Profile</h1>
+          <p class="section-subtitle">View your profile information</p>
+        </div>
+        <div class="profile-display-card">
+          <div class="profile-info-group">
+            <label>Manager:</label>
+            <span id="displayProfileManager" class="profile-value">-</span>
+          </div>
+          <div class="profile-info-group">
+            <label>Name:</label>
+            <span id="displayProfileName" class="profile-value">-</span>
+          </div>
+          <div class="profile-info-group">
+            <label>Email:</label>
+            <span id="displayProfileEmail" class="profile-value">-</span>
+          </div>
+          <div class="profile-info-group">
+            <label>Department:</label>
+            <span id="displayProfileDepartment" class="profile-value">-</span>
+          </div>
+          <div class="profile-info-group">
+            <label>Member Since:</label>
+            <span id="displayProfileMemberSince" class="profile-value">-</span>
+          </div>
+          <div class="profile-info-group">
+            <label>Roles:</label>
+            <span id="displayProfileRoles" class="profile-value">-</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Edit Profile Section -->
+      <section id="editProfile-section" class="section">
+        <div class="section-header">
+          <h1>Edit Profile</h1>
+          <p class="section-subtitle">Update your profile information</p>
+        </div>
+        <div class="profile-form-card">
+          <form id="profileEditForm">
+            <div class="form-group">
+              <label class="form-label">Manager</label>
+              <input type="text" id="editProfileManager" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input type="text" id="editProfileName" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="editProfileEmail" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Department</label>
+              <input type="text" id="editProfileDepartment" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Roles</label>
+              <div class="roles-grid" id="editRolesGrid"></div>
+              <p class="form-help">Select one or more roles for this user.</p>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" onclick="saveProfileChanges()">Save Changes</button>
+              <button type="button" class="btn btn-secondary" onclick="resetProfileForm()">Reset</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- My Roles Section -->
+      <section id="myRoles-section" class="section">
+        <div class="section-header">
+          <h1>My Roles</h1>
+          <p class="section-subtitle">View your assigned roles</p>
+        </div>
+        <div class="roles-display-card">
+          <div id="displayRolesList" class="roles-display-list"></div>
+        </div>
+      </section>
+
+      <!-- Calendar Section -->
+      <section id="calendar-section" class="section">
+        <div class="section-header">
+          <h1>📅 Calendar</h1>
+          <p class="section-subtitle">View Jira due dates, holidays, and manage events</p>
+        </div>
+
+        <div class="calendar-container">
+          <!-- Calendar Header with Controls -->
+          <div class="calendar-header" id="calendarHeader">
+            <!-- Will be populated by JavaScript -->
+          </div>
+
+          <!-- Calendar View -->
+          <div class="calendar-grid-wrapper">
+            <!-- Days of week header -->
+            <div class="calendar-days-header" id="calendarDaysHeader">
+              <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="calendar-grid" id="calendarGrid">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="calendar-legend">
+            <h3>Legend</h3>
+            <div class="legend-items">
+              <div class="legend-item">
+                <span class="calendar-ticket-badge ticket-defect">ID</span>
+                <span>Jira Ticket (Due Date)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-holiday">🎉</span>
+                <span>Holiday</span>
+              </div>
+              <div class="legend-item">
+                <span class="calendar-event-badge event-default">Evt</span>
+                <span>User Event</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day Details Modal -->
+        <div class="calendar-modal" id="calendarDayModal">
+          <div class="calendar-modal-content" id="calendarDayModalContent">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Event Modal -->
+        <div class="calendar-modal" id="calendarEventModal">
+          <div class="calendar-modal-content">
+            <div class="calendar-modal-header">
+              <h2 id="calendarEventModalTitle">Add Event</h2>
+              <button class="calendar-modal-close" onclick="CalendarManager.closeEventModal()">×</button>
+            </div>
+
+            <form id="calendarEventForm" class="event-form">
+              <input type="hidden" id="eventId">
+
+              <div class="form-group">
+                <label class="form-label required-field">Event Title</label>
+                <input type="text" id="eventTitle" class="form-input" placeholder="Enter event title" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required-field">Date</label>
+                <input type="date" id="eventDate" class="form-input" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Time</label>
+                <input type="time" id="eventTime" class="form-input">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Event Type</label>
+                <select id="eventType" class="form-input">
+                  <option value="meeting">Meeting</option>
+                  <option value="deadline">Deadline</option>
+                  <option value="reminder">Reminder</option>
+                  <option value="milestone">Milestone</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="eventDescription" class="form-input" placeholder="Enter event description" rows="3"></textarea>
+              </div>
+
+              <div class="calendar-modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="CalendarManager.closeEventModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="CalendarManager.saveEvent()">Save Event</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Modal Overlay Close Script -->
+        <script>
+          // Close modal when clicking outside
+          window.addEventListener('click', (event) => {
+            const dayModal = document.getElementById('calendarDayModal');
+            const eventModal = document.getElementById('calendarEventModal');
+
+            if (event.target === dayModal) {
+              dayModal.style.display = 'none';
+            }
+            if (event.target === eventModal) {
+              eventModal.style.display = 'none';
+            }
+          });
+        </script>
+      </section>
+
+      <!-- Resolved Section -->
+      <section id="resolved-section" class="section">
+        <div class="section-header">
+          <h1>Resolved Items</h1>
+          <p class="section-subtitle">View all resolved defects and change requests</p>
+        </div>
+
+        <div class="section-actions">
+          <button class="btn btn-secondary" onclick="exportResolvedItems()">📥 Export CSV</button>
+        </div>
+
+        <div class="items-container" id="resolvedList">
+          <p class="empty-state">No resolved items yet.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Mobile Bottom Navigation -->
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
+  <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+    <button type="button" class="mobile-nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+      <span>Home</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-section="defects" onclick="showSection('defects')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6a4 4 0 0 1 8 0M6 10h12v5a6 6 0 0 1-12 0zM12 10v11M3 13h3M18 13h3M4 19l2.5-1.5M20 19l-2.5-1.5M4 7l2.5 2M20 7l-2.5 2"/></svg>
+      <span>Defects</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-section="changeRequests" onclick="showSection('changeRequests')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5M8.5 13h7M8.5 17h5"/></svg>
+      <span>CRs</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-section="calendar" onclick="showSection('calendar')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM4 10h16M8 3v4M16 3v4"/></svg>
+      <span>Calendar</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-section="more" onclick="toggleMobileMenu()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <span>More</span>
+    </button>
+  </nav>
+
+  <!-- Modals -->
+  <div id="userMenuOverlay" class="menu-overlay" onclick="closeUserMenu()"></div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal" onclick="if(event.target.id === 'profileModal') closeModal('profileModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>User Profile</h2>
+        <button class="modal-close" onclick="closeModal('profileModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="profile-info">
+          <div class="info-group">
+            <label>Name:</label>
+            <span id="profileName">-</span>
+          </div>
+          <div class="info-group">
+            <label>Email:</label>
+            <span id="profileEmail">-</span>
+          </div>
+          <div class="info-group">
+            <label>Roles:</label>
+            <span id="profileRoles">-</span>
+          </div>
+          <div class="info-group">
+            <label>Department:</label>
+            <span id="profileDepartment">-</span>
+          </div>
+          <div class="info-group">
+            <label>Member Since:</label>
+            <span id="profileMemberSince">-</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('profileModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="editProfileModal" class="modal" onclick="if(event.target.id === 'editProfileModal') closeModal('editProfileModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <button class="modal-close" onclick="closeModal('editProfileModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editProfileForm">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input type="text" id="editName" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="editEmail" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input type="text" id="editDepartment" class="form-input">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('editProfileModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roles Modal -->
+  <div id="rolesModal" class="modal" onclick="if(event.target.id === 'rolesModal') closeModal('rolesModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>My Roles</h2>
+        <button class="modal-close" onclick="closeModal('rolesModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="rolesList" class="roles-list">
+          <p>No roles assigned</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('rolesModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Defect Modal -->
+  <div id="editDefectModal" class="modal" onclick="if(event.target.id === 'editDefectModal') closeModal('editDefectModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Defect</h2>
+        <button class="modal-close" onclick="closeModal('editDefectModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editDefectForm">
+          <input type="hidden" id="editDefectId">
+          <div class="form-group">
+            <label class="form-label">JIRA ID</label>
+            <input type="text" id="editDefectJiraId" class="form-input" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" id="editDefectTitle" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="editDefectDescription" class="form-input" style="min-height: 100px;"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <select id="editDefectPriority" class="form-input">
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select id="editDefectStatus" class="form-input">
+              <option value="Not Started">Not Started</option>
+              <option value="On Hold">On Hold</option>
+              <option value="Blocked">Blocked</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Code Review/Migration">Code Review/Migration</option>
+              <option value="Ready for Retest">Ready for Retest</option>
+              <option value="In QA testing">In QA testing</option>
+              <option value="Await UAT Verification">Await UAT Verification</option>
+              <option value="Await PROD Verification">Await PROD Verification</option>
+              <option value="Await PROD Migration">Await PROD Migration</option>
+              <option value="Failed">Failed</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Triage">Triage</option>
+              <option value="Withdrawn">Withdrawn</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Deferred">Deferred</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assignee</label>
+            <input type="text" id="editDefectAssignee" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input type="date" id="editDefectDueDate" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Component/Module</label>
+            <input type="text" id="editDefectComponent" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Application</label>
+            <select id="editDefectApplication" class="form-input">
+              <option value="">-- Not Specified (PUB) --</option>
+              <option value="PUB">PUB</option>
+              <option value="EDCA">EDCA</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Severity</label>
+            <select id="editDefectSeverity" class="form-input">
+              <option value="">Select Severity</option>
+              <option value="Blocker">Blocker</option>
+              <option value="Major">Major</option>
+              <option value="Minor">Minor</option>
+              <option value="Trivial">Trivial</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Environment</label>
+            <select id="editDefectEnvironment" class="form-input">
+              <option value="">Select Environment</option>
+              <option value="Development">Development</option>
+              <option value="Staging">Staging</option>
+              <option value="Production">Production</option>
+              <option value="QA">QA</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">JIRA Link</label>
+            <input type="url" id="editDefectJiraLink" class="form-input" placeholder="https://jira.example.com/browse/PROJ-1234">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('editDefectModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveDefect()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit CR Modal -->
+  <div id="editCRModal" class="modal" onclick="if(event.target.id === 'editCRModal') closeModal('editCRModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Change Request</h2>
+        <button class="modal-close" onclick="closeModal('editCRModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editCRForm">
+          <input type="hidden" id="editCRId">
+          <div class="form-group">
+            <label class="form-label">JIRA ID</label>
+            <input type="text" id="editCRJiraId" class="form-input" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" id="editCRTitle" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="editCRDescription" class="form-input" style="min-height: 100px;"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <select id="editCRPriority" class="form-input">
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select id="editCRStatus" class="form-input">
+              <option value="Not Started">Not Started</option>
+              <option value="On Hold">On Hold</option>
+              <option value="Blocked">Blocked</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Code Review/Migration">Code Review/Migration</option>
+              <option value="Ready for Retest">Ready for Retest</option>
+              <option value="In QA testing">In QA testing</option>
+              <option value="Await UAT Verification">Await UAT Verification</option>
+              <option value="Await PROD Verification">Await PROD Verification</option>
+              <option value="Await PROD Migration">Await PROD Migration</option>
+              <option value="Failed">Failed</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Triage">Triage</option>
+              <option value="Withdrawn">Withdrawn</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Deferred">Deferred</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Change Type</label>
+            <select id="editCRChangeType" class="form-input">
+              <option value="">Select Type</option>
+              <option value="Enhancement">Enhancement</option>
+              <option value="Bug Fix">Bug Fix</option>
+              <option value="Configuration">Configuration</option>
+              <option value="Patch">Patch</option>
+              <option value="Infrastructure">Infrastructure</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Impact Level</label>
+            <select id="editCRImpactLevel" class="form-input">
+              <option value="">Select Impact</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assignee</label>
+            <input type="text" id="editCRAssignee" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Affected Systems</label>
+            <input type="text" id="editCRaffectedSystems" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input type="date" id="editCRDueDate" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Risk Level</label>
+            <select id="editCRRiskLevel" class="form-input">
+              <option value="">Select Risk Level</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Application</label>
+            <select id="editCRApplication" class="form-input">
+              <option value="">-- Not Specified (PUB) --</option>
+              <option value="PUB">PUB</option>
+              <option value="EDCA">EDCA</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">JIRA Link</label>
+            <input type="url" id="editCRJiraLink" class="form-input" placeholder="https://jira.example.com/browse/CR-1234">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('editCRModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCR()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testing Environments Modal -->
+  <div id="testingEnvironmentsModal" class="modal" onclick="if(event.target.id === 'testingEnvironmentsModal') closeTestingEnvironmentsModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Testing Enviroments</h2>
+        <button class="modal-close" onclick="closeTestingEnvironmentsModal()" aria-label="Close testing environments modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="testing-environments-grid">
+          <a class="btn btn-primary testing-environment-link" href="https://pub-dev.ch2h-d1.cf.comcast.net" target="_blank" rel="noopener noreferrer">Developement</a>
+          <a class="btn btn-primary testing-environment-link" href="https://pub-tst.asd-d1.cf.comcast.net" target="_blank" rel="noopener noreferrer">Quality Assurance1</a>
+          <a class="btn btn-primary testing-environment-link" href="https://pub-tst.pob-d1.cf.comcast.net" target="_blank" rel="noopener noreferrer">Quality Assurance2</a>
+          <a class="btn btn-primary testing-environment-link" href="https://pub-stg.ch2h-s1.cf.comcast.net" target="_blank" rel="noopener noreferrer">Stage1</a>
+          <a class="btn btn-primary testing-environment-link" href="https://pub-stg.pob-s1.cf.comcast.net" target="_blank" rel="noopener noreferrer">Stage2</a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeTestingEnvironmentsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- eDCA Testing Environments Modal -->
+  <div id="edcaEnvironmentsModal" class="modal" onclick="if(event.target.id === 'edcaEnvironmentsModal') closeEdcaEnvironmentsModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">eDCA Test Environments</h2>
+        <button class="modal-close" onclick="closeEdcaEnvironmentsModal()" aria-label="Close eDCA test environments modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="testing-environments-grid">
+          <a class="btn btn-primary testing-environment-link" href="https://edca-fusion-dev.ch2h-d1.cf.comcast.net/" target="_blank" rel="noopener noreferrer">DEV</a>
+          <a class="btn btn-primary testing-environment-link" href="https://edca-fusion-tst.asd-d1.cf.comcast.net/" target="_blank" rel="noopener noreferrer">TST1</a>
+          <a class="btn btn-primary testing-environment-link" href="https://edca-fusion-tst.pob-d1.cf.comcast.net/" target="_blank" rel="noopener noreferrer">TST2</a>
+          <a class="btn btn-primary testing-environment-link" href="https://edca-fusion-stg.ch2h-s1.cf.comcast.net/" target="_blank" rel="noopener noreferrer">STG1</a>
+          <a class="btn btn-primary testing-environment-link" href="https://edca-fusion-stg.pob-s1.cf.comcast.net/" target="_blank" rel="noopener noreferrer">STG2</a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeEdcaEnvironmentsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Links Modal -->
+  <div id="siteLinksModal" class="modal" onclick="if(event.target.id === 'siteLinksModal') closeSiteLinksModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Site Links</h2>
+        <button class="modal-close" onclick="closeSiteLinksModal()" aria-label="Close site links modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="testing-environments-grid">
+          <a class="btn btn-primary testing-environment-link" href="https://techspot.comcast.com/techspot?id=ts_cat_item_v2&amp;table=sc_cat_item&amp;sys_id=c08fbbba1b03d21010faec64604bcb44&amp;recordUrl=com.glideapp.servicecatalog_cat_item_view.do%3Fv%3D1&amp;sysparm_id=c08fbbba1b03d21010faec64604bcb44" target="_blank" rel="noopener noreferrer">Techspot</a>
+          <a class="btn btn-primary testing-environment-link" href="https://comcast.service-now.com/now/nav/ui/classic/params/target/x_mcim_it_service_case2_list.do%3Fsysparm_query%3DstateIN1%252C2%252C10%252C15%252C18%252C5%255Eassignment_group.nameSTARTSWITHTPE-TGEXT-FusionERP%255EORassignment_group.nameSTARTSWITHTPX-CX-SE%2520-FIN%2520TECH_Peripherals_Hyperion_ESSBASE%3ANTL%255EORassignment_group.nameSTARTSWITHTPE-TGEXT-IncortaX-DevOps_NTL%255Esymptom_category%253D6505456d1b57d210dac725cb234bcb3f" target="_blank" rel="noopener noreferrer">IOP</a>
+          <a class="btn btn-primary testing-environment-link" href="https://mycomcastaccess.comcast.com/identityiq/plugins/pluginPage.jsf?pn=manageaccess#/manageaccess/search" target="_blank" rel="noopener noreferrer">MCA</a>
+          <a class="btn btn-primary testing-environment-link" href="https://atpprodords.sys.comcast.net/ords/r/cmst_common/commonloggingframework/dashboard?session=102407591583739" target="_blank" rel="noopener noreferrer">CLF</a>
+          <a class="btn btn-primary testing-environment-link" href="https://github.com/comcast-sce/fusion-pub" target="_blank" rel="noopener noreferrer">PUB Github</a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeSiteLinksModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- High Priority Modal -->
+  <div id="highPriorityModal" class="modal" onclick="if(event.target.id === 'highPriorityModal') closeHighPriorityModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">High Priority Items</h2>
+        <button class="modal-close" onclick="closeHighPriorityModal()" aria-label="Close high priority modal">&times;</button>
+      </div>
+      <div class="modal-body" id="highPriorityModalBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeHighPriorityModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fusion Modal -->
+  <div id="fusionModal" class="modal" onclick="if(event.target.id === 'fusionModal') closeFusionModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Fusion</h2>
+        <button class="modal-close" onclick="closeFusionModal()" aria-label="Close fusion modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="testing-environments-grid">
+          <a class="btn btn-primary testing-environment-link" href="https://eiie-dev2.fa.us6.oraclecloud.com/fscmUI/faces/FuseWelcome?_adf.ctrl-state=58wpjo14z_5&fnd=%3B%3B%3B%3Bfalse%3B256%3B%3B%3B&_afrLoop=31309734647034698" target="_blank" rel="noopener noreferrer">Developement2</a>
+          <a class="btn btn-primary testing-environment-link" href="https://eiie-dev3.login.us6.oraclecloud.com/oam/server/obrareq.cgi?ECID-Context=1.006HZT7N4or4ykV6y3Zf6G003Fmb000249%3BkXjE" target="_blank" rel="noopener noreferrer">Developement3</a>
+          <a class="btn btn-primary testing-environment-link" href="https://fa-eiie-dev4-saasfaprod1.fa.ocs.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome?_afrLoop=31561960575032793&_afrWindowMode=0&_afrWindowId=null&_adf.ctrl-state=k95019mjy_1&_afrFS=16&_afrMT=screen&_afrMFW=1920&_afrMFH=958&_afrMFDW=1920&_afrMFDH=1080&_afrMFC=8&_afrMFCI=0&_afrMFM=0&_afrMFR=96&_afrMFG=0&_afrMFS=0&_afrMFO=0" target="_blank" rel="noopener noreferrer">Quality Assurance</a>
+          <a class="btn btn-primary testing-environment-link" href="https://fa-eiie-dev4-saasfaprod1.fa.ocs.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome?_afrLoop=31561960575032793&_afrWindowMode=0&_afrWindowId=null&_adf.ctrl-state=k95019mjy_1&_afrFS=16&_afrMT=screen&_afrMFW=1920&_afrMFH=958&_afrMFDW=1920&_afrMFDH=1080&_afrMFC=8&_afrMFCI=0&_afrMFM=0&_afrMFR=96&_afrMFG=0&_afrMFS=0&_afrMFO=0" target="_blank" rel="noopener noreferrer">Quality</a>
+          <a class="btn btn-primary testing-environment-link" href="https://eiie-test.fa.us6.oraclecloud.com/fscmUI/faces/FuseWelcome?_afrLoop=22401741920756441&_afrWindowMode=0&_afrWindowId=null&_adf.ctrl-state=skykfa8xh_1&_afrFS=16&_afrMT=screen&_afrMFW=1728&_afrMFH=958&_afrMFDW=1728&_afrMFDH=1117&_afrMFC=10&_afrMFCI=0&_afrMFM=0&_afrMFR=192&_afrMFG=0&_afrMFS=0&_afrMFO=0" target="_blank" rel="noopener noreferrer">Stage</a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeFusionModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RTO Tracker Modal -->
+  <div id="rtoTrackerModal" class="modal" onclick="if(event.target.id === 'rtoTrackerModal') closeRTOModal()">
+    <div class="modal-content rto-modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">RTO Calendar Tracker</h2>
+        <button class="modal-close" onclick="closeRTOModal()" aria-label="Close RTO tracker modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="rto-modal-grid">
+          <div class="form-group">
+            <label class="form-label" for="rtoMonthPicker">Month</label>
+            <input type="month" id="rtoMonthPicker" class="form-input" aria-label="Select month for RTO tracking">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="rtoOfficeLocationSelect">Office Location</label>
+            <select id="rtoOfficeLocationSelect" class="form-input" aria-label="Select office location for selected day">
+              <option value="Center City">Center City</option>
+              <option value="West Chester">West Chester</option>
+              <option value="Newark">Newark</option>
+              <option value="Bishops Gate">Bishops Gate</option>
+              <option value="Remote - Office Visit">Remote - Office Visit</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="rto-selected-day" id="rtoSelectedDateLabel">Select a workday on the calendar.</div>
+
+        <div class="rto-calendar-shell">
+          <div class="rto-calendar-weekdays">
+            <span>Sun</span>
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+          </div>
+          <div id="rtoCalendarGrid" class="rto-calendar-grid"></div>
+        </div>
+
+        <div class="rto-editor-actions">
+          <button class="btn btn-primary" id="rtoSaveDayBtn" type="button">Save Selected Day</button>
+          <button class="btn btn-secondary" id="rtoDeleteDayBtn" type="button">Delete Selected Day</button>
+          <button class="btn btn-secondary" id="rtoExportCsvBtn" type="button" onclick="RTOTracker.downloadMonthlyCSV()">Download Monthly CSV</button>
+        </div>
+
+        <div class="rto-modal-details" id="rtoMonthDetails">0 tracked days / 0 workdays (0%)</div>
+        <div class="rto-modal-status" id="rtoStatusMessage">Select a day and save the office location.</div>
+
+        <div class="rto-tracked-days">
+          <h3>Tracked Days</h3>
+          <div id="rtoTrackedDaysList" class="rto-tracked-days-list">
+            <p class="empty-state">No tracked office days for this month.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeRTOModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket Detail Modal -->
+  <div id="ticketModal" class="ticket-modal-overlay" onclick="if(event.target.id === 'ticketModal') closeTicketModal()">
+    <div class="ticket-modal-content">
+      <div class="ticket-modal-header">
+        <h2 id="modalTitle">Ticket Details</h2>
+        <button class="ticket-modal-close" onclick="closeTicketModal()" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="ticket-modal-body" id="ticketModalBody">
+        <!-- Content populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
+  <script src="api-service.js"></script>
+  <script src="app-firestore.js?v=20261119-description-links"></script>
+  <script src="holidays.js"></script>
+  <script src="calendar.js"></script>
+  <script src="ticker.js"></script>
+  <script src="tech-news.js"></script>
+</body>
+</html>

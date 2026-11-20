@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Intake - PUB Manager</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="apple-mobile-web-app-title" content="PUB Manager" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261119-description-links" />
+  <style>
+    .form-page-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-section {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .form-section-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-lg);
+      color: var(--text-primary);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 2px solid var(--secondary);
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Header -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-section">
+          <img src="pub-manager-logo.png" alt="PUB Manager" class="header-logo-image">
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <div class="form-page-container">
+      <div class="section-header">
+        <h1>Add New Intake</h1>
+        <p class="section-subtitle">Create and track a new intake request in the system</p>
+      </div>
+
+      <form id="intakeForm">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h2 class="form-section-title">Basic Information</h2>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label required-field">JIRA ID</label>
+              <input type="text" id="jiraId" class="form-input" placeholder="e.g., INTAKE-1234" required>
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required-field">Priority</label>
+              <select id="priority" class="form-input" required>
+                <option value="">Select Priority</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <div class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">JIRA Link</label>
+            <input type="url" id="jiraLink" class="form-input" placeholder="https://jira.example.com/browse/INTAKE-1234">
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required-field">Title</label>
+            <input type="text" id="title" class="form-input" placeholder="Brief description of the intake" required>
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="description" class="form-input" placeholder="Detailed description of the intake request..." style="resize: vertical; min-height: 120px;"></textarea>
+            <div class="error-message"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Application</label>
+            <select id="application" class="form-input">
+              <option value="">-- Not Specified (PUB) --</option>
+              <option value="PUB">PUB</option>
+              <option value="EDCA">EDCA</option>
+            </select>
+            <div class="error-message"></div>
+          </div>
+        </div>
+
+        <!-- Intake Details -->
+        <div class="form-section">
+          <h2 class="form-section-title">Intake Details</h2>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="status" class="form-input">
+                <option value="">Select Status</option>
+                <option value="Not Started">Not Started</option>
+                <option value="In Progress">In Progress</option>
+                <option value="In Review">In Review</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Completed">Completed</option>
+              </select>
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Intake Type</label>
+              <select id="intakeType" class="form-input">
+                <option value="">Select Type</option>
+                <option value="Request">Request</option>
+                <option value="Proposal">Proposal</option>
+                <option value="Inquiry">Inquiry</option>
+                <option value="Change">Change</option>
+              </select>
+              <div class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Business Case</label>
+            <textarea id="businessCase" class="form-input" placeholder="Describe the business case..." style="resize: vertical; min-height: 100px;"></textarea>
+            <div class="error-message"></div>
+          </div>
+        </div>
+
+        <!-- Assignment & Timeline -->
+        <div class="form-section">
+          <h2 class="form-section-title">Assignment & Timeline</h2>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label required-field">Assigned To</label>
+              <input type="text" id="assignee" class="form-input" placeholder="Team member name" required>
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Requested By</label>
+              <input type="text" id="requestedBy" class="form-input" placeholder="Name of requester">
+              <div class="error-message"></div>
+            </div>
+          </div>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label class="form-label">Target Start Date</label>
+              <input type="date" id="startDate" class="form-input">
+              <div class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Due Date</label>
+              <input type="date" id="dueDate" class="form-input">
+              <div class="error-message"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-section" style="border: none; box-shadow: none; padding: 0;">
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="goBack()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Intake</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Check authentication
+    if (!sessionStorage.getItem('loggedInUser')) {
+      window.location.href = 'login.html';
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+
+    function validateForm() {
+      const form = document.getElementById('intakeForm');
+      const jiraId = document.getElementById('jiraId').value.trim();
+      const priority = document.getElementById('priority').value;
+      const title = document.getElementById('title').value.trim();
+      const assignee = document.getElementById('assignee').value.trim();
+
+      if (!jiraId || !priority || !title || !assignee) {
+        alert('Please fill in all required fields');
+        return false;
+      }
+
+      return true;
+    }
+
+    // Form submission
+    document.getElementById('intakeForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      if (!validateForm()) {
+        return;
+      }
+
+      try {
+        const submitBtn = e.target.querySelector('[type="submit"]');
+        submitBtn.disabled = true;
+
+        const intake = {
+          jiraId: document.getElementById('jiraId').value.trim(),
+          jiraLink: document.getElementById('jiraLink').value.trim(),
+          priority: document.getElementById('priority').value,
+          title: document.getElementById('title').value.trim(),
+          description: document.getElementById('description').value.trim(),
+          application: document.getElementById('application').value || 'PUB',
+          status: document.getElementById('status').value || 'Not Started',
+          intakeType: document.getElementById('intakeType').value,
+          businessCase: document.getElementById('businessCase').value.trim(),
+          assignee: document.getElementById('assignee').value.trim(),
+          requestedBy: document.getElementById('requestedBy').value.trim(),
+          startDate: document.getElementById('startDate').value,
+          dueDate: document.getElementById('dueDate').value
+        };
+
+        // Call Firestore API
+        await api.addIntake(intake);
+
+        alert('Intake created successfully!');
+        window.location.href = 'index.html';
+      } catch (error) {
+        alert('Error: ' + error.message);
+        e.target.querySelector('[type="submit"]').disabled = false;
+      }
+    });
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
+  <script src="api-service.js"></script>
+  <script src="app-firestore.js?v=20261119-description-links"></script>
+</body>
+</html>
